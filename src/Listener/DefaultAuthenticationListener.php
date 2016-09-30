@@ -1,0 +1,193 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: n3vra
+ * Date: 6/17/2016
+ * Time: 4:24 PM
+ */
+
+namespace Dot\Authentication\Web\Listener;
+
+use Dot\Authentication\AuthenticationInterface;
+use Dot\Authentication\AuthenticationResult;
+use Dot\Authentication\Web\Event\AuthenticationEvent;
+use Dot\Authentication\Web\Options\WebAuthenticationOptions;
+use Dot\FlashMessenger\FlashMessengerInterface;
+use Dot\Helpers\Route\RouteOptionHelper;
+use Zend\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\Response\RedirectResponse;
+use Zend\Diactoros\Uri;
+use Zend\EventManager\AbstractListenerAggregate;
+use Zend\EventManager\EventManagerInterface;
+use Zend\Expressive\Template\TemplateRendererInterface;
+
+class DefaultAuthenticationListener extends AbstractListenerAggregate
+{
+    /** @var  TemplateRendererInterface */
+    protected $template;
+
+    /** @var  RouteOptionHelper */
+    protected $routeHelper;
+
+    /** @var  AuthenticationInterface */
+    protected $authentication;
+
+    /** @var  WebAuthenticationOptions */
+    protected $options;
+
+    /** @var  FlashMessengerInterface */
+    protected $flashMessenger;
+
+    /**
+     * DefaultAuthenticationListener constructor.
+     * @param AuthenticationInterface $authentication
+     * @param TemplateRendererInterface $template
+     * @param RouteOptionHelper $routeHelper
+     * @param FlashMessengerInterface $flashMessenger
+     * @param WebAuthenticationOptions $options
+     */
+    public function __construct(
+        AuthenticationInterface $authentication,
+        TemplateRendererInterface $template,
+        RouteOptionHelper $routeHelper,
+        FlashMessengerInterface $flashMessenger,
+        WebAuthenticationOptions $options
+    )
+    {
+        $this->authentication = $authentication;
+        $this->routeHelper = $routeHelper;
+        $this->template = $template;
+        $this->options = $options;
+        $this->flashMessenger = $flashMessenger;
+    }
+
+    /**
+     * @param EventManagerInterface $events
+     * @param int $priority
+     */
+    public function attach(EventManagerInterface $events, $priority = 1)
+    {
+        $this->listeners[] = $events->attach(
+            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+            [$this, 'prepare'],
+            1000
+        );
+
+        $this->listeners[] = $events->attach(
+            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+            [$this, 'authenticate'],
+            1
+        );
+
+        $this->listeners[] = $events->attach(
+            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+            [$this, 'authenticationPost'],
+            -1000
+        );
+    }
+
+    /**
+     * @param AuthenticationEvent $e
+     */
+    public function prepare(AuthenticationEvent $e)
+    {
+        //nothing to prepare for now, let it to implementors
+    }
+
+    /**
+     * @param AuthenticationEvent $e
+     */
+    public function authenticate(AuthenticationEvent $e)
+    {
+        $request = $e->getRequest();
+        $response = $e->getResponse();
+        $error = $e->getError();
+        if($request->getMethod() === 'POST' && empty($error)) {
+
+            $result = $this->authentication->authenticate($request, $response);
+
+            if($result instanceof AuthenticationResult) {
+                $e->setAuthenticationResult($result);
+                
+                if($result->isValid()) {
+                    $e->setIdentity($result->getIdentity());
+                }
+                else {
+                    $e->setError((array) $result->getMessage());
+                }
+
+                //set the possibly modified PSR7 messages to the event
+                if($result->getRequest())
+                    $e->setRequest($result->getRequest());
+
+                if($result->getResponse())
+                    $e->setResponse($result->getResponse());
+            }
+        }
+    }
+
+    /**
+     * @param AuthenticationEvent $e
+     * @return HtmlResponse|RedirectResponse
+     * @throws \Exception
+     */
+    public function authenticationPost(AuthenticationEvent $e)
+    {
+        $request = $e->getRequest();
+        if($request->getMethod() === 'POST') {
+            $error = $e->getError();
+            if(!empty($error)) {
+                return $this->prgRedirect($e);
+            }
+
+            $result = $e->getAuthenticationResult();
+            if($result->isValid()) {
+                $uri = $this->routeHelper->getUri($this->options->getAfterLoginRoute());
+
+                if($this->options->isAllowRedirect()) {
+                    $params = $e->getRequest()->getQueryParams();
+                    $redirectParam = $this->options->getRedirectQueryName();
+                    
+                    if(isset($params[$redirectParam]) && !empty($params[$redirectParam])) {
+                        $uri = new Uri(urldecode($params[$redirectParam]));
+                    }
+                }
+
+                return new RedirectResponse($uri);
+            }
+        }
+
+        return $this->renderTemplate($e);
+    }
+
+    protected function prgRedirect(AuthenticationEvent $e)
+    {
+        $request = $e->getRequest();
+        $error = $e->getError();
+        if(is_array($error)) {
+            foreach ($error as $e) {
+                if(is_string($e)) {
+                    $this->flashMessenger->addError($error);
+                }
+            }
+        }
+        elseif($error instanceof \Exception) {
+            $this->flashMessenger->addError($error->getMessage());
+        }
+        else {
+            $this->flashMessenger->addError('Authentication failed. Check your credentials and try again');
+        }
+
+
+        return new RedirectResponse($request->getUri(), 303);
+    }
+
+    /**
+     * @param AuthenticationEvent $e
+     * @return RedirectResponse
+     */
+    protected function renderTemplate(AuthenticationEvent $e)
+    {
+        return new HtmlResponse($this->template->render($this->options->getLoginTemplate(), $e->getParams()));
+    }
+}

@@ -1,23 +1,27 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
  * Date: 4/30/2016
  * Time: 8:40 PM
  */
 
 namespace Dot\Authentication\Web\Factory;
 
+use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\Action\LoginAction;
-use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Authentication\Web\Listener\DefaultAuthenticationListener;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
+use Dot\Helpers\Route\RouteOptionHelper;
 use Interop\Container\ContainerInterface;
-use N3vrax\DkAuthentication\AuthenticationInterface;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
-use Zend\Expressive\Helper\UrlHelper;
 
+/**
+ * Class LoginActionFactory
+ * @package Dot\Authentication\Web\Factory
+ */
 class LoginActionFactory
 {
     /**
@@ -35,16 +39,13 @@ class LoginActionFactory
         $defaultListeners->attach($eventManager);
 
         $authentication = $container->get(AuthenticationInterface::class);
-        $event = new AuthenticationEvent();
-        $event->setAuthenticationService($authentication);
 
         $action = new LoginAction(
             $authentication,
-            $container->get(WebAuthenticationOptions::class),
-            $container->get(UrlHelper::class)
+            $container->get(RouteOptionHelper::class),
+            $container->get(WebAuthenticationOptions::class)
         );
-        
-        $action->setEvent($event);
+
         $action->setEventManager($eventManager);
 
         return $action;

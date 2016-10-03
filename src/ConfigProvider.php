@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
  * Date: 5/19/2016
  * Time: 12:54 AM
  */
@@ -10,12 +11,13 @@ namespace Dot\Authentication\Web;
 
 use Dot\Authentication\Web\Action\LoginAction;
 use Dot\Authentication\Web\Action\LogoutAction;
+use Dot\Authentication\Web\ErrorHandler\UnauthorizedHandler;
 use Dot\Authentication\Web\Factory\DefaultAuthenticationListenerFactory;
 use Dot\Authentication\Web\Factory\DefaultLogoutListenerFactory;
 use Dot\Authentication\Web\Factory\DefaultUnauthorizedListenerFactory;
 use Dot\Authentication\Web\Factory\LoginActionFactory;
 use Dot\Authentication\Web\Factory\LogoutActionFactory;
-use Dot\Authentication\Web\Factory\ModuleOptionsFactory;
+use Dot\Authentication\Web\Factory\WebAuthenticationOptionsFactory;
 use Dot\Authentication\Web\Factory\UnauthorizedHandlerFactory;
 use Dot\Authentication\Web\Listener\DefaultAuthenticationListener;
 use Dot\Authentication\Web\Listener\DefaultLogoutListener;
@@ -29,7 +31,7 @@ class ConfigProvider
         return [
             'dependencies' => [
                 'factories' => [
-                    WebAuthenticationOptions::class => ModuleOptionsFactory::class,
+                    WebAuthenticationOptions::class => WebAuthenticationOptionsFactory::class,
 
                     LoginAction::class => LoginActionFactory::class,
                     LogoutAction::class => LogoutActionFactory::class,
@@ -68,7 +70,7 @@ class ConfigProvider
                 ],
             ],
 
-            'dk_authentication' => [
+            'dot_authentication' => [
                 'web' => [
                     'login_route' => 'login',
                     'logout_route' => 'logout',

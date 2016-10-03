@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
  * Date: 4/30/2016
  * Time: 8:37 PM
  */
@@ -78,7 +79,7 @@ class LoginAction
         $result = $this->getEventManager()->triggerEventUntil(function ($r) {
             return ($r instanceof ResponseInterface);
         }, $event);
-        
+
         $result = $result->last();
         if ($result instanceof ResponseInterface) {
             return $result;

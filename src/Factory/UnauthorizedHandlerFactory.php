@@ -1,21 +1,26 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
  * Date: 5/1/2016
  * Time: 3:15 PM
  */
 
 namespace Dot\Authentication\Web\Factory;
 
+use Dot\Authentication\AuthenticationInterface;
+use Dot\Authentication\Web\ErrorHandler\UnauthorizedHandler;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
+use Dot\Authentication\Web\Listener\DefaultUnauthorizedListener;
 use Interop\Container\ContainerInterface;
-use N3vrax\DkAuthentication\AuthenticationInterface;
-use N3vrax\DkWebAuthentication\Listener\DefaultUnauthorizedListener;
-use N3vrax\DkWebAuthentication\UnauthorizedHandler;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
 
+/**
+ * Class UnauthorizedHandlerFactory
+ * @package Dot\Authentication\Web\Factory
+ */
 class UnauthorizedHandlerFactory
 {
     /**
@@ -24,20 +29,15 @@ class UnauthorizedHandlerFactory
      */
     public function __invoke(ContainerInterface $container)
     {
-        $handler = new UnauthorizedHandler();
-
         $eventManager = $container->has(EventManagerInterface::class)
             ? $container->get(EventManagerInterface::class)
             : new EventManager();
 
-        $event = new AuthenticationEvent();
-        $event->setAuthenticationService($container->get(AuthenticationInterface::class));
-
         $defaultListener = $container->get(DefaultUnauthorizedListener::class);
-        $eventManager->attach(AuthenticationEvent::EVENT_UNAUTHORIZED, $defaultListener, 1);
+        $eventManager->attach(AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED, $defaultListener, 1);
 
+        $handler = new UnauthorizedHandler($container->get(AuthenticationInterface::class));
         $handler->setEventManager($eventManager);
-        $handler->setEvent(new AuthenticationEvent());
 
         return $handler;
     }

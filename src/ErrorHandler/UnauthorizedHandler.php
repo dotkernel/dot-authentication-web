@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
  * Date: 4/30/2016
  * Time: 10:45 PM
  */

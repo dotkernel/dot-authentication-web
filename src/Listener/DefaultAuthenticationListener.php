@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
  * Date: 6/17/2016
  * Time: 4:24 PM
  */
@@ -21,6 +22,10 @@ use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Expressive\Template\TemplateRendererInterface;
 
+/**
+ * Class DefaultAuthenticationListener
+ * @package Dot\Authentication\Web\Listener
+ */
 class DefaultAuthenticationListener extends AbstractListenerAggregate
 {
     /** @var  TemplateRendererInterface */
@@ -52,8 +57,7 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
         RouteOptionHelper $routeHelper,
         FlashMessengerInterface $flashMessenger,
         WebAuthenticationOptions $options
-    )
-    {
+    ) {
         $this->authentication = $authentication;
         $this->routeHelper = $routeHelper;
         $this->template = $template;
@@ -102,26 +106,27 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
         $request = $e->getRequest();
         $response = $e->getResponse();
         $error = $e->getError();
-        if($request->getMethod() === 'POST' && empty($error)) {
+        if ($request->getMethod() === 'POST' && empty($error)) {
 
             $result = $this->authentication->authenticate($request, $response);
 
-            if($result instanceof AuthenticationResult) {
+            if ($result instanceof AuthenticationResult) {
                 $e->setAuthenticationResult($result);
-                
-                if($result->isValid()) {
+
+                if ($result->isValid()) {
                     $e->setIdentity($result->getIdentity());
-                }
-                else {
-                    $e->setError((array) $result->getMessage());
+                } else {
+                    $e->setError((array)$result->getMessage());
                 }
 
                 //set the possibly modified PSR7 messages to the event
-                if($result->getRequest())
+                if ($result->getRequest()) {
                     $e->setRequest($result->getRequest());
+                }
 
-                if($result->getResponse())
+                if ($result->getResponse()) {
                     $e->setResponse($result->getResponse());
+                }
             }
         }
     }
@@ -134,21 +139,21 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
     public function authenticationPost(AuthenticationEvent $e)
     {
         $request = $e->getRequest();
-        if($request->getMethod() === 'POST') {
+        if ($request->getMethod() === 'POST') {
             $error = $e->getError();
-            if(!empty($error)) {
+            if (!empty($error)) {
                 return $this->prgRedirect($e);
             }
 
             $result = $e->getAuthenticationResult();
-            if($result->isValid()) {
+            if ($result->isValid()) {
                 $uri = $this->routeHelper->getUri($this->options->getAfterLoginRoute());
 
-                if($this->options->isAllowRedirect()) {
+                if ($this->options->isAllowRedirectParam()) {
                     $params = $e->getRequest()->getQueryParams();
-                    $redirectParam = $this->options->getRedirectQueryName();
-                    
-                    if(isset($params[$redirectParam]) && !empty($params[$redirectParam])) {
+                    $redirectParam = $this->options->getRedirectParamName();
+
+                    if (isset($params[$redirectParam]) && !empty($params[$redirectParam])) {
                         $uri = new Uri(urldecode($params[$redirectParam]));
                     }
                 }
@@ -164,20 +169,18 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
     {
         $request = $e->getRequest();
         $error = $e->getError();
-        if(is_array($error)) {
+        if (is_array($error)) {
             foreach ($error as $e) {
-                if(is_string($e)) {
+                if (is_string($e)) {
                     $this->flashMessenger->addError($error);
                 }
             }
-        }
-        elseif($error instanceof \Exception) {
+        } elseif ($error instanceof \Exception) {
             $this->flashMessenger->addError($error->getMessage());
+        } else {
+            $this->flashMessenger->addError(
+                $this->options->getMessage(WebAuthenticationOptions::MESSAGE_DEFAULT_AUTHENTICATION_FAIL));
         }
-        else {
-            $this->flashMessenger->addError('Authentication failed. Check your credentials and try again');
-        }
-
 
         return new RedirectResponse($request->getUri(), 303);
     }

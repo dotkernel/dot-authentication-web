@@ -1,19 +1,24 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
  * Date: 6/17/2016
  * Time: 8:12 PM
  */
 
 namespace Dot\Authentication\Web\Factory;
 
+use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\Listener\DefaultLogoutListener;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
+use Dot\Helpers\Route\RouteOptionHelper;
 use Interop\Container\ContainerInterface;
-use N3vrax\DkAuthentication\AuthenticationInterface;
-use Zend\Expressive\Helper\UrlHelper;
 
+/**
+ * Class DefaultLogoutListenerFactory
+ * @package Dot\Authentication\Web\Factory
+ */
 class DefaultLogoutListenerFactory
 {
     /**
@@ -24,8 +29,8 @@ class DefaultLogoutListenerFactory
     {
         $options = $container->get(WebAuthenticationOptions::class);
         $authentication = $container->get(AuthenticationInterface::class);
-        $urlHelper = $container->get(UrlHelper::class);
+        $routeHelper = $container->get(RouteOptionHelper::class);
 
-        return new DefaultLogoutListener($authentication, $urlHelper, $options);
+        return new DefaultLogoutListener($authentication, $routeHelper, $options);
     }
 }

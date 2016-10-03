@@ -1,0 +1,29 @@
+<?php
+
+return [
+    'dependencies' => [
+        //whatever dependencies you need additionally
+
+    ],
+
+    'dot_authentication' => [
+        //this package's specific configuration template
+        'web' => [
+            //change next two only if you changed the default login/logout routes
+            'login_route' => ['name' => 'login', 'params' => [], 'query_params' => []],
+            'logout_route' => ['name' => 'logout', 'params' => []],
+
+            //template name to use for the login form
+            'login_template' => 'app::login',
+
+            //where to redirect after login success
+            'after_login_route' => ['name' => 'my-account', 'params' => []],
+            //where to redirect after logging out
+            'after_logout_route' => ['name' => 'login', 'params' => []],
+
+            //enable the wanted url feature, to login to the previously requested uri after login
+            'allow_redirect_param' => true,
+            'redirect_param_name' => 'redirect',
+        ]
+    ]
+];

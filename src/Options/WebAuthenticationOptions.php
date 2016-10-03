@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
  * Date: 4/30/2016
  * Time: 9:36 PM
  */
@@ -9,6 +10,7 @@
 namespace Dot\Authentication\Web\Options;
 
 use Zend\Stdlib\AbstractOptions;
+use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class WebAuthenticationOptions
@@ -16,6 +18,9 @@ use Zend\Stdlib\AbstractOptions;
  */
 class WebAuthenticationOptions extends AbstractOptions
 {
+    const MESSAGE_DEFAULT_AUTHENTICATION_FAIL = 1;
+    const MESSAGE_DEFAULT_UNAUTHORIZED = 2;
+
     /** @var string|array */
     protected $loginRoute = 'login';
 
@@ -32,10 +37,18 @@ class WebAuthenticationOptions extends AbstractOptions
     protected $loginTemplate;
 
     /** @var bool */
-    protected $allowRedirect = true;
+    protected $allowRedirectParam = true;
 
     /** @var string */
-    protected $redirectQueryName = 'redirect';
+    protected $redirectParamName = 'redirect';
+
+    protected $messages = [
+        WebAuthenticationOptions::MESSAGE_DEFAULT_AUTHENTICATION_FAIL =>
+            'Authentication failed. Check your credentials and try again',
+
+        WebAuthenticationOptions::MESSAGE_DEFAULT_UNAUTHORIZED =>
+            'You are not authorize to access this content',
+    ];
 
     protected $__strictMode__ = false;
 
@@ -132,37 +145,62 @@ class WebAuthenticationOptions extends AbstractOptions
     /**
      * @return boolean
      */
-    public function isAllowRedirect()
+    public function isAllowRedirectParam()
     {
-        return $this->allowRedirect;
+        return $this->allowRedirectParam;
     }
 
     /**
-     * @param boolean $allowRedirect
+     * @param boolean $allowRedirectParam
      * @return WebAuthenticationOptions
      */
-    public function setAllowRedirect($allowRedirect)
+    public function setAllowRedirectParam($allowRedirectParam)
     {
-        $this->allowRedirect = $allowRedirect;
+        $this->allowRedirectParam = $allowRedirectParam;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getRedirectQueryName()
+    public function getRedirectParamName()
     {
-        return $this->redirectQueryName;
+        return $this->redirectParamName;
     }
 
     /**
-     * @param string $redirectQueryName
+     * @param string $redirectParamName
      * @return WebAuthenticationOptions
      */
-    public function setRedirectQueryName($redirectQueryName)
+    public function setRedirectParamName($redirectParamName)
     {
-        $this->redirectQueryName = $redirectQueryName;
+        $this->redirectParamName = $redirectParamName;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+    /**
+     * @param $messages
+     * @return $this
+     */
+    public function setMessages($messages)
+    {
+        $this->messages = ArrayUtils::merge($this->messages, $messages, true);
+        return $this;
+    }
+    /**
+     * @param $key
+     * @return mixed|string
+     */
+    public function getMessage($key)
+    {
+        return isset($this->messages[$key]) ? $this->messages[$key] : 'Unknown message';
     }
 
 }

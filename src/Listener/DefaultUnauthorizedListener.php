@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
  * Date: 6/17/2016
  * Time: 7:50 PM
  */
@@ -10,18 +11,22 @@ namespace Dot\Authentication\Web\Listener;
 
 use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
-use Dot\Authentication\Web\RouteOptionParserTrait;
-use N3vrax\DkSession\FlashMessenger\FlashMessengerInterface;
+use Dot\FlashMessenger\FlashMessengerInterface;
+use Dot\Helpers\Route\RouteOptionHelper;
+use Dot\Helpers\Route\UriHelperTrait;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
-use Zend\Expressive\Helper\UrlHelper;
 
+/**
+ * Class DefaultUnauthorizedListener
+ * @package Dot\Authentication\Web\Listener
+ */
 class DefaultUnauthorizedListener
 {
-    use RouteOptionParserTrait;
+    use UriHelperTrait;
 
-    /** @var  UrlHelper */
-    protected $urlHelper;
+    /** @var  RouteOptionHelper */
+    protected $routeHelper;
 
     /** @var  WebAuthenticationOptions */
     protected $options;
@@ -31,17 +36,17 @@ class DefaultUnauthorizedListener
 
     /**
      * DefaultUnauthorizedListener constructor.
-     * @param UrlHelper $urlHelper
+     * @param RouteOptionHelper $routeHelper
      * @param FlashMessengerInterface $flashMessenger
      * @param WebAuthenticationOptions $options
      */
     public function __construct(
-        UrlHelper $urlHelper,
+        RouteOptionHelper $routeHelper,
         FlashMessengerInterface $flashMessenger,
         WebAuthenticationOptions $options
     )
     {
-        $this->urlHelper = $urlHelper;
+        $this->routeHelper = $routeHelper;
         $this->options = $options;
         $this->flashMessenger = $flashMessenger;
     }
@@ -56,38 +61,25 @@ class DefaultUnauthorizedListener
         $request = $e->getRequest();
 
         $messages = [];
-        $error = $e->getParam('error', null);
-        if(is_string($error)) {
-            $messages[] = $error;
-        }
-
-        if(is_array($error)) {
-            $messages = $error;
-        }
-
-        if($error instanceof \Exception) {
-            $messages[] = $error->getMessage();
+        $error = $e->getError();
+        if (is_array($error)) {
+            foreach ($error as $e) {
+                if (is_string($e)) {
+                    $messages[] = $e;
+                }
+            }
+        } else {
+            if (is_string($error)) {
+                $messages[] = $error;
+            } else {
+                if ($error instanceof \Exception) {
+                    $messages[] = $error->getMessage();
+                }
+            }
         }
 
         if(empty($messages)) {
-            $messages = ['You are not authorized to access this content'];
-        }
-
-        /** @var Uri $uri */
-        $uri = $this->getUri($this->options->getLoginRoute(), $this->urlHelper);
-        $query = $uri->getQuery();
-        $arr = [];
-        if($this->options->isAllowRedirect())
-        {
-            if (!empty($query)) {
-                parse_str($query, $arr);
-            }
-
-            $query = http_build_query(
-                array_merge($arr, [$this->options->getRedirectQueryName() => urlencode($request->getUri())]));
-
-            if (!empty($query))
-                $uri = $uri->withQuery($query);
+            $messages = [$this->options->getMessage(WebAuthenticationOptions::MESSAGE_DEFAULT_UNAUTHORIZED)];
         }
 
         //add a flash message in case the login page displays errors
@@ -97,62 +89,13 @@ class DefaultUnauthorizedListener
             }
         }
 
+        /** @var Uri $uri */
+        $uri = $this->routeHelper->getUri($this->options->getLoginRoute());
+        if($this->options->isAllowRedirectParam()) {
+            $uri = $this->appendQueryParam($uri, $request->getUri(), $this->options->getRedirectParamName());
+        }
+
         return new RedirectResponse($uri);
     }
-
-    /**
-     * @return UrlHelper
-     */
-    public function getUrlHelper()
-    {
-        return $this->urlHelper;
-    }
-
-    /**
-     * @param UrlHelper $urlHelper
-     * @return DefaultUnauthorizedListener
-     */
-    public function setUrlHelper($urlHelper)
-    {
-        $this->urlHelper = $urlHelper;
-        return $this;
-    }
-
-    /**
-     * @return WebAuthenticationOptions
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param WebAuthenticationOptions $options
-     * @return DefaultUnauthorizedListener
-     */
-    public function setOptions($options)
-    {
-        $this->options = $options;
-        return $this;
-    }
-
-    /**
-     * @return FlashMessengerInterface
-     */
-    public function getFlashMessenger()
-    {
-        return $this->flashMessenger;
-    }
-
-    /**
-     * @param FlashMessengerInterface $flashMessenger
-     * @return DefaultUnauthorizedListener
-     */
-    public function setFlashMessenger($flashMessenger)
-    {
-        $this->flashMessenger = $flashMessenger;
-        return $this;
-    }
-
 
 }

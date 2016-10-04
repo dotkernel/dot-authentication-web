@@ -27,10 +27,16 @@ class DefaultUnauthorizedListenerFactory
      */
     public function __invoke(ContainerInterface $container)
     {
+        $config = $container->get('config');
+        $debug = isset($config['debug']) ? $config['debug'] : false;
+
         $routeHelper = $container->get(RouteOptionHelper::class);
         $flashMessenger = $container->get(FlashMessengerInterface::class);
         $options = $container->get(WebAuthenticationOptions::class);
 
-        return new DefaultUnauthorizedListener($routeHelper, $flashMessenger, $options);
+        $listener = new DefaultUnauthorizedListener($routeHelper, $flashMessenger, $options);
+        $listener->setDebug($debug);
+
+        return $listener;
     }
 }

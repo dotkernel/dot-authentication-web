@@ -9,6 +9,7 @@
 
 namespace Dot\Authentication\Web\Listener;
 
+use Dot\Authentication\Exception\UnauthorizedException;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
@@ -34,6 +35,9 @@ class DefaultUnauthorizedListener
     /** @var  FlashMessengerInterface */
     protected $flashMessenger;
 
+    /** @var bool */
+    protected $debug = false;
+
     /**
      * DefaultUnauthorizedListener constructor.
      * @param RouteOptionHelper $routeHelper
@@ -44,8 +48,7 @@ class DefaultUnauthorizedListener
         RouteOptionHelper $routeHelper,
         FlashMessengerInterface $flashMessenger,
         WebAuthenticationOptions $options
-    )
-    {
+    ) {
         $this->routeHelper = $routeHelper;
         $this->options = $options;
         $this->flashMessenger = $flashMessenger;
@@ -68,17 +71,15 @@ class DefaultUnauthorizedListener
                     $messages[] = $e;
                 }
             }
-        } else {
-            if (is_string($error)) {
-                $messages[] = $error;
-            } else {
-                if ($error instanceof \Exception) {
-                    $messages[] = $error->getMessage();
-                }
+        } elseif (is_string($error)) {
+            $messages[] = $error;
+        } elseif ($error instanceof \Exception) {
+            if($this->isDebug() || $error instanceof UnauthorizedException) {
+                $messages[] = $error->getMessage();
             }
         }
 
-        if(empty($messages)) {
+        if (empty($messages)) {
             $messages = [$this->options->getMessage(WebAuthenticationOptions::MESSAGE_DEFAULT_UNAUTHORIZED)];
         }
 
@@ -91,11 +92,29 @@ class DefaultUnauthorizedListener
 
         /** @var Uri $uri */
         $uri = $this->routeHelper->getUri($this->options->getLoginRoute());
-        if($this->options->isAllowRedirectParam()) {
+        if ($this->options->isAllowRedirectParam()) {
             $uri = $this->appendQueryParam($uri, $request->getUri(), $this->options->getRedirectParamName());
         }
 
         return new RedirectResponse($uri);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDebug()
+    {
+        return $this->debug;
+    }
+
+    /**
+     * @param boolean $debug
+     * @return DefaultUnauthorizedListener
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+        return $this;
     }
 
 }

@@ -18,8 +18,8 @@ use Zend\Stdlib\ArrayUtils;
  */
 class WebAuthenticationOptions extends AbstractOptions
 {
-    const MESSAGE_DEFAULT_AUTHENTICATION_FAIL = 1;
-    const MESSAGE_DEFAULT_UNAUTHORIZED = 2;
+    const AUTHENTICATION_FAIL_MESSAGE = 1;
+    const UNAUTHORIZED_MESSAGE = 2;
 
     /** @var string|array */
     protected $loginRoute = 'login';
@@ -43,10 +43,10 @@ class WebAuthenticationOptions extends AbstractOptions
     protected $redirectParamName = 'redirect';
 
     protected $messages = [
-        WebAuthenticationOptions::MESSAGE_DEFAULT_AUTHENTICATION_FAIL =>
+        WebAuthenticationOptions::AUTHENTICATION_FAIL_MESSAGE =>
             'Authentication failed. Check your credentials and try again',
 
-        WebAuthenticationOptions::MESSAGE_DEFAULT_UNAUTHORIZED =>
+        WebAuthenticationOptions::UNAUTHORIZED_MESSAGE =>
             'You are not authorize to access this content',
     ];
 

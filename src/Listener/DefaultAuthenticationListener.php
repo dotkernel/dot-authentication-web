@@ -179,7 +179,7 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
             $this->flashMessenger->addError($error->getMessage());
         } else {
             $this->flashMessenger->addError(
-                $this->options->getMessage(WebAuthenticationOptions::MESSAGE_DEFAULT_AUTHENTICATION_FAIL));
+                $this->options->getMessage(WebAuthenticationOptions::AUTHENTICATION_FAIL_MESSAGE));
         }
 
         return new RedirectResponse($request->getUri(), 303);

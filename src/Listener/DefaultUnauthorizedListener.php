@@ -80,7 +80,7 @@ class DefaultUnauthorizedListener
         }
 
         if (empty($messages)) {
-            $messages = [$this->options->getMessage(WebAuthenticationOptions::MESSAGE_DEFAULT_UNAUTHORIZED)];
+            $messages = [$this->options->getMessage(WebAuthenticationOptions::UNAUTHORIZED_MESSAGE)];
         }
 
         //add a flash message in case the login page displays errors

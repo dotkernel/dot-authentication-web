@@ -86,7 +86,7 @@ class LoginAction
         return $next($request, $response);
     }
 
-    public function triggerAuthenticationEvent(ServerRequestInterface $request, ResponseInterface $response, $data)
+    public function triggerAuthenticateEvent(ServerRequestInterface $request, ResponseInterface $response, $data)
     {
         $event = $this->createAuthenticationEvent(
             $this->authentication,

@@ -70,7 +70,7 @@ class LoginAction
             $data = $request->getParsedBody();
         }
 
-        $result = $this->triggerAuthenticationEvent($request, $response, $data);
+        $result = $this->triggerAuthenticateEvent($request, $response, $data);
         if ($result instanceof ResponseInterface) {
             return $result;
         }

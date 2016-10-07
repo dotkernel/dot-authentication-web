@@ -70,17 +70,7 @@ class LoginAction
             $data = $request->getParsedBody();
         }
 
-        $event = $this->createAuthenticationEvent(
-            $this->authentication,
-            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
-            $data, $request, $response
-        );
-
-        $result = $this->getEventManager()->triggerEventUntil(function ($r) {
-            return ($r instanceof ResponseInterface);
-        }, $event);
-
-        $result = $result->last();
+        $result = $this->triggerAuthenticationEvent($request, $response, $data);
         if ($result instanceof ResponseInterface) {
             return $result;
         }
@@ -94,5 +84,21 @@ class LoginAction
         );
 
         return $next($request, $response);
+    }
+
+    public function triggerAuthenticationEvent(ServerRequestInterface $request, ResponseInterface $response, $data)
+    {
+        $event = $this->createAuthenticationEvent(
+            $this->authentication,
+            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+            $data, $request, $response
+        );
+
+        $result = $this->getEventManager()->triggerEventUntil(function ($r) {
+            return ($r instanceof ResponseInterface);
+        }, $event);
+
+        $result = $result->last();
+        return $result;
     }
 }

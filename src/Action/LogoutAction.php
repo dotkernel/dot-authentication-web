@@ -65,16 +65,7 @@ class LogoutAction
             return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLogoutRoute()));
         }
 
-        $event = $this->createAuthenticationEvent(
-            $this->authentication,
-            AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT,
-            [], $request, $response);
-
-        $result = $this->getEventManager()->triggerEventUntil(function ($r) {
-            return ($r instanceof ResponseInterface);
-        }, $event);
-
-        $result = $result->last();
+        $result = $this->triggerLogoutEvent($request, $response);
         if ($result instanceof ResponseInterface) {
             return $result;
         }
@@ -88,5 +79,20 @@ class LogoutAction
         );
 
         return $next($request, $response);
+    }
+
+    public function triggerLogoutEvent(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $event = $this->createAuthenticationEvent(
+            $this->authentication,
+            AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT,
+            [], $request, $response);
+
+        $result = $this->getEventManager()->triggerEventUntil(function ($r) {
+            return ($r instanceof ResponseInterface);
+        }, $event);
+
+        $result = $result->last();
+        return $result;
     }
 }

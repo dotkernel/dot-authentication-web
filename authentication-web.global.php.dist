@@ -26,7 +26,9 @@ return [
             'redirect_param_name' => 'redirect',
 
             //for overwriting default module messages
-            //message_options => [],
+            'messages_options' => [
+                'messages' => [],
+            ],
         ]
     ]
 ];

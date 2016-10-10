@@ -74,6 +74,8 @@ class ConfigProvider
                 'web' => [
                     'login_route' => 'login',
                     'logout_route' => 'logout',
+
+                    'message_options' => [],
                 ]
             ]
         ];

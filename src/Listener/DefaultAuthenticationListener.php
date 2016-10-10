@@ -12,6 +12,7 @@ namespace Dot\Authentication\Web\Listener;
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\AuthenticationResult;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
+use Dot\Authentication\Web\Options\MessageOptions;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
@@ -179,7 +180,7 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
             $this->flashMessenger->addError($error->getMessage());
         } else {
             $this->flashMessenger->addError(
-                $this->options->getMessage(WebAuthenticationOptions::AUTHENTICATION_FAIL_MESSAGE));
+                $this->options->getMessageOptions()->getMessage(MessageOptions::AUTHENTICATION_FAIL_MESSAGE));
         }
 
         return new RedirectResponse($request->getUri(), 303);

@@ -24,6 +24,9 @@ return [
             //enable the wanted url feature, to login to the previously requested uri after login
             'allow_redirect_param' => true,
             'redirect_param_name' => 'redirect',
+
+            //for overwriting default module messages
+            //message_options => [],
         ]
     ]
 ];

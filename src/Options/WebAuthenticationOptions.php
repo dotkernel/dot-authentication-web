@@ -9,6 +9,7 @@
 
 namespace Dot\Authentication\Web\Options;
 
+use Dot\Authentication\Web\Exception\InvalidArgumentException;
 use Zend\Stdlib\AbstractOptions;
 use Zend\Stdlib\ArrayUtils;
 
@@ -18,9 +19,6 @@ use Zend\Stdlib\ArrayUtils;
  */
 class WebAuthenticationOptions extends AbstractOptions
 {
-    const AUTHENTICATION_FAIL_MESSAGE = 0;
-    const UNAUTHORIZED_MESSAGE = 1;
-
     /** @var string|array */
     protected $loginRoute = 'login';
 
@@ -42,13 +40,8 @@ class WebAuthenticationOptions extends AbstractOptions
     /** @var string */
     protected $redirectParamName = 'redirect';
 
-    protected $messages = [
-        WebAuthenticationOptions::AUTHENTICATION_FAIL_MESSAGE =>
-            'Authentication failed. Check your credentials and try again',
-
-        WebAuthenticationOptions::UNAUTHORIZED_MESSAGE =>
-            'You must be authenticated to access this content',
-    ];
+    /** @var  MessageOptions */
+    protected $messageOptions;
 
     protected $__strictMode__ = false;
 
@@ -179,28 +172,34 @@ class WebAuthenticationOptions extends AbstractOptions
     }
 
     /**
-     * @return array
+     * @return MessageOptions
      */
-    public function getMessages()
+    public function getMessageOptions()
     {
-        return $this->messages;
+        if (!$this->messageOptions) {
+            $this->setMessageOptions([]);
+        }
+        return $this->messageOptions;
     }
+
     /**
-     * @param $messages
-     * @return $this
+     * @param MessageOptions|array $messageOptions
+     * @return WebAuthenticationOptions
      */
-    public function setMessages($messages)
+    public function setMessageOptions($messageOptions)
     {
-        $this->messages = ArrayUtils::merge($this->messages, $messages, true);
+        if (is_array($messageOptions)) {
+            $this->messageOptions = new MessageOptions($messageOptions);
+        } elseif ($messageOptions instanceof MessageOptions) {
+            $this->messageOptions = $messageOptions;
+        } else {
+            throw new InvalidArgumentException(sprintf(
+                'MessageOptions should be an array or an %s object. %s provided.',
+                MessageOptions::class,
+                is_object($messageOptions) ? get_class($messageOptions) : gettype($messageOptions)
+            ));
+        }
         return $this;
-    }
-    /**
-     * @param $key
-     * @return mixed|string
-     */
-    public function getMessage($key)
-    {
-        return isset($this->messages[$key]) ? $this->messages[$key] : 'Unknown message';
     }
 
 }

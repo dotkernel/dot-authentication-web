@@ -75,7 +75,7 @@ class DefaultUnauthorizedListener
         } elseif (is_string($error)) {
             $messages[] = $error;
         } elseif ($error instanceof \Exception) {
-            if($this->isDebug() || $error instanceof UnauthorizedException) {
+            if ($this->isDebug() || $error instanceof UnauthorizedException) {
                 $messages[] = $error->getMessage();
             }
         }

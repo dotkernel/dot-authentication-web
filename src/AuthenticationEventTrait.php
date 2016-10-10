@@ -70,7 +70,7 @@ trait AuthenticationEventTrait
 
         $event = $this->createAuthenticationEvent($authentication, $name, $eventParams, $request, $response);
         $event->setError($error);
-        
+
         return $event;
     }
 }

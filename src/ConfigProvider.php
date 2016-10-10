@@ -17,8 +17,8 @@ use Dot\Authentication\Web\Factory\DefaultLogoutListenerFactory;
 use Dot\Authentication\Web\Factory\DefaultUnauthorizedListenerFactory;
 use Dot\Authentication\Web\Factory\LoginActionFactory;
 use Dot\Authentication\Web\Factory\LogoutActionFactory;
-use Dot\Authentication\Web\Factory\WebAuthenticationOptionsFactory;
 use Dot\Authentication\Web\Factory\UnauthorizedHandlerFactory;
+use Dot\Authentication\Web\Factory\WebAuthenticationOptionsFactory;
 use Dot\Authentication\Web\Listener\DefaultAuthenticationListener;
 use Dot\Authentication\Web\Listener\DefaultLogoutListener;
 use Dot\Authentication\Web\Listener\DefaultUnauthorizedListener;
@@ -37,7 +37,7 @@ class ConfigProvider
                     LogoutAction::class => LogoutActionFactory::class,
 
                     UnauthorizedHandler::class => UnauthorizedHandlerFactory::class,
-                    
+
                     DefaultAuthenticationListener::class => DefaultAuthenticationListenerFactory::class,
                     DefaultLogoutListener::class => DefaultLogoutListenerFactory::class,
                     DefaultUnauthorizedListener::class => DefaultUnauthorizedListenerFactory::class,
@@ -49,7 +49,7 @@ class ConfigProvider
                     'middleware' => [
                         UnauthorizedHandler::class,
                     ],
-                    'error'    => true,
+                    'error' => true,
                     'priority' => -10000,
                 ],
             ],

@@ -15,5 +15,5 @@ namespace Dot\Authentication\Web\Exception;
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
-    
+
 }

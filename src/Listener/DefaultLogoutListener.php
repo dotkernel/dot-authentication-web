@@ -38,11 +38,11 @@ class DefaultLogoutListener extends AbstractListenerAggregate
      * @param RouteOptionHelper $routeHelper
      * @param WebAuthenticationOptions $options
      */
-    public function  __construct(
+    public function __construct(
         AuthenticationInterface $authentication,
         RouteOptionHelper $routeHelper,
-        WebAuthenticationOptions $options)
-    {
+        WebAuthenticationOptions $options
+    ) {
         $this->authentication = $authentication;
         $this->options = $options;
         $this->routeHelper = $routeHelper;

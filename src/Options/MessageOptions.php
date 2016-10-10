@@ -37,6 +37,7 @@ class MessageOptions extends AbstractOptions
     {
         return $this->messages;
     }
+
     /**
      * @param $messages
      * @return $this
@@ -46,6 +47,7 @@ class MessageOptions extends AbstractOptions
         $this->messages = ArrayUtils::merge($this->messages, $messages, true);
         return $this;
     }
+
     /**
      * @param $key
      * @return mixed|string

@@ -11,7 +11,7 @@ namespace Dot\Authentication\Web\Listener;
 
 use Dot\Authentication\Exception\UnauthorizedException;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
-use Dot\Authentication\Web\Options\MessageOptions;
+use Dot\Authentication\Web\Options\MessagesOptions;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
@@ -81,7 +81,7 @@ class DefaultUnauthorizedListener
         }
 
         if (empty($messages)) {
-            $messages = [$this->options->getMessageOptions()->getMessage(MessageOptions::UNAUTHORIZED_MESSAGE)];
+            $messages = [$this->options->getMessagesOptions()->getMessage(MessagesOptions::UNAUTHORIZED_MESSAGE)];
         }
 
         //add a flash message in case the login page displays errors

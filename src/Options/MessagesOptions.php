@@ -16,16 +16,16 @@ use Zend\Stdlib\ArrayUtils;
  * Class MessageOptions
  * @package Dot\Authentication\Web\Options
  */
-class MessageOptions extends AbstractOptions
+class MessagesOptions extends AbstractOptions
 {
     const AUTHENTICATION_FAIL_MESSAGE = 0;
     const UNAUTHORIZED_MESSAGE = 1;
 
     protected $messages = [
-        MessageOptions::AUTHENTICATION_FAIL_MESSAGE =>
+        MessagesOptions::AUTHENTICATION_FAIL_MESSAGE =>
             'Authentication failed. Check your credentials and try again',
 
-        MessageOptions::UNAUTHORIZED_MESSAGE =>
+        MessagesOptions::UNAUTHORIZED_MESSAGE =>
             'You must be authenticated to access this content',
     ];
 

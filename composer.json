@@ -38,20 +38,6 @@
       "DotTest\\Authentication\\Web\\": "test/"
     }
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-authentication.git"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-event.git"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-helpers.git"
-    }
-  ],
   "extra": {
     "branch-alias": {
       "dev-master": "0.6-dev"

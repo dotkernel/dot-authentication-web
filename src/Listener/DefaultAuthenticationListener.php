@@ -176,6 +176,8 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
                     $this->flashMessenger->addError($error);
                 }
             }
+        } elseif (is_string($error)) {
+            $this->flashMessenger->addError($error);
         } elseif ($error instanceof \Exception) {
             $this->flashMessenger->addError($error->getMessage());
         } else {

@@ -188,7 +188,7 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
 
     /**
      * @param AuthenticationEvent $e
-     * @return RedirectResponse
+     * @return HtmlResponse
      */
     protected function renderTemplate(AuthenticationEvent $e)
     {

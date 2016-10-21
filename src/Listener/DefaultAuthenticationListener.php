@@ -117,7 +117,7 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
                 if ($result->isValid()) {
                     $e->setIdentity($result->getIdentity());
                 } else {
-                    $e->setError((array)$result->getMessage());
+                    $e->setError($result->getMessage());
                 }
 
                 //set the possibly modified PSR7 messages to the event
@@ -170,13 +170,7 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
     {
         $request = $e->getRequest();
         $error = $e->getError();
-        if (is_array($error)) {
-            foreach ($error as $e) {
-                if (is_string($e)) {
-                    $this->flashMessenger->addError($error);
-                }
-            }
-        } elseif (is_string($error)) {
+        if (is_array($error) || is_string($error)) {
             $this->flashMessenger->addError($error);
         } elseif ($error instanceof \Exception) {
             $this->flashMessenger->addError($error->getMessage());

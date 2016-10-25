@@ -29,6 +29,7 @@ class MessagesOptions extends AbstractOptions
             'You must be authenticated to access this content',
     ];
 
+    protected $__strictMode__ = false;
 
     /**
      * @return array

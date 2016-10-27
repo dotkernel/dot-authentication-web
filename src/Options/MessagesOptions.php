@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
- * Date: 10/10/2016
- * Time: 7:10 PM
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-authentication-web
+ * @author: n3vrax
+ * Date: 4/30/2016
+ * Time: 8:37 PM
  */
 
 namespace Dot\Authentication\Web\Options;

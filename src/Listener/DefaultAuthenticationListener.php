@@ -12,6 +12,7 @@ namespace Dot\Authentication\Web\Listener;
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\AuthenticationResult;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
+use Dot\Authentication\Web\Exception\RuntimeException;
 use Dot\Authentication\Web\Options\MessagesOptions;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
@@ -110,6 +111,12 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
         if ($request->getMethod() === 'POST' && empty($error)) {
 
             $result = $this->authentication->authenticate($request, $response);
+            //we get this in case authentication skipped(due to missing credentials in request)
+            //but for web application, we want to force implemetors to prepare their auth adapter first
+            //so we throw an exception to be clear developers have missed something
+            if ($result === false) {
+                throw new RuntimeException('Authentication service could not authenticate request. Have you prepared the adapter first?');
+            }
 
             if ($result instanceof AuthenticationResult) {
                 $e->setAuthenticationResult($result);
@@ -147,7 +154,7 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
             }
 
             $result = $e->getAuthenticationResult();
-            if ($result->isValid()) {
+            if ($result && $result->isValid()) {
                 $uri = $this->routeHelper->getUri($this->options->getAfterLoginRoute());
 
                 if ($this->options->isAllowRedirectParam()) {

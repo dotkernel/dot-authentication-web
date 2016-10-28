@@ -115,7 +115,8 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
             //but for web application, we want to force implemetors to prepare their auth adapter first
             //so we throw an exception to be clear developers have missed something
             if ($result === false) {
-                throw new RuntimeException('Authentication service could not authenticate request. Have you prepared the adapter first?');
+                throw new RuntimeException('Authentication service could not authenticate request. '.
+                    'Have you forgot to prepare the request first according to authentication adapter needs?');
             }
 
             if ($result instanceof AuthenticationResult) {

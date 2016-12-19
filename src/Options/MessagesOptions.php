@@ -27,7 +27,7 @@ class MessagesOptions extends AbstractOptions
             'Authentication failed. Check your credentials and try again',
 
         MessagesOptions::UNAUTHORIZED_MESSAGE =>
-            'You must be authenticated to access this content',
+            'You must be authenticated to access the requested content',
     ];
 
     protected $__strictMode__ = false;

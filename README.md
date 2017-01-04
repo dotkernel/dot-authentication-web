@@ -68,7 +68,7 @@ The actual authentication process happens on a listener registered at priority 1
 Please note the authentication event is triggered on both GET and POST requests. You should check in your listeners the request method before taking the appropriate action.
 
 There is also a post authentication listener at priority -1000 that checks if there are errors and redirects back to the login page.
-If authentication succeeded, it redirect to the after login route or the wanted url.
+If authentication succeeded, it redirects to the after login route or the wanted url.
 
 You can come with your own listeners to further extend the functionality or even completely rewrite the authentication process.
 
@@ -76,12 +76,12 @@ You can come with your own listeners to further extend the functionality or even
 ## Logout flow
 
 Calling LogoutAction middleware, similar to login, it triggers a logout event. We provide a default logout listeners that uses an AuthenticationInterface service to clear the identity from storage.
-It also redirect to the after logout route as configured. Again, you can register your own listeners for this event to do additional actions when users log out.
+It also redirects to the after logout route as configured. Again, you can register your own listeners for this event to do additional actions when users log out.
 
 ## Unauthorized exception handling
 
 A piped error handler middleware is provided to catch UnauthorizedException or any Exception or response that has a 401 code.
-In the same vein as login/logout, the unauthorized handler does not process the exception, it delegates instead responsibility to listeners of an unauthorized event.
+In the same vein as login/logout, the unauthorized handler does not process the exception, it delegates instead responsibility to listeners by triggering an unauthorized event.
 
 The default unauthorized listener process the authentication error messages, setting them as session messages(flash messages) and redirects back to the login route, optionally appending the wanted url to the query.
 
@@ -99,6 +99,6 @@ The package provides default listeners for all these events, in order to provide
 
 ## Useful observations
 
-* The default authentication listener skips if the AuthenticationEvent errors is not empty. This allows you to have pre authentication listeners to make additional validations for example.
-* The AuthenticationEvent->getParams() are sent to the login template, so you can inject your own variables into template(like the form for example)
-* If you have listeners that return a ResponseInterface, you basically interrupt the listener chain. You could use this to completely rewrite the authentication flow if needed.
+* The default authentication listener skips if the AuthenticationEvent errors property is not empty. This allows you to have pre authentication listeners to make additional validations for example.
+* The AuthenticationEvent->getParams() are sent to the login template, so you can inject your own variables into the template(like the login form, for example)
+* If you have listeners that return a ResponseInterface, you basically interrupt the listener chain. You could use this to completely rewrite the authentication flow if needed, by registering listeners before all the default ones that are provided.

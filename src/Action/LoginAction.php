@@ -91,7 +91,9 @@ class LoginAction
         $event = $this->createAuthenticationEvent(
             $this->authentication,
             AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
-            $data, $request, $response
+            $data,
+            $request,
+            $response
         );
 
         $result = $this->getEventManager()->triggerEventUntil(function ($r) {

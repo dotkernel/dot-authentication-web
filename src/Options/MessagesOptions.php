@@ -9,7 +9,6 @@
 
 namespace Dot\Authentication\Web\Options;
 
-
 use Zend\Stdlib\AbstractOptions;
 use Zend\Stdlib\ArrayUtils;
 

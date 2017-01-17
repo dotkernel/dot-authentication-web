@@ -109,13 +109,12 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
         $response = $e->getResponse();
         $error = $e->getError();
         if ($request->getMethod() === 'POST' && empty($error)) {
-
             $result = $this->authentication->authenticate($request, $response);
             //we get this in case authentication skipped(due to missing credentials in request)
             //but for web application, we want to force implemetors to prepare their auth adapter first
             //so we throw an exception to be clear developers have missed something
             if ($result === false) {
-                throw new RuntimeException('Authentication service could not authenticate request. '.
+                throw new RuntimeException('Authentication service could not authenticate request. ' .
                     'Have you forgot to prepare the request first according to authentication adapter needs?');
             }
 
@@ -184,7 +183,8 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
             $this->flashMessenger->addError($error->getMessage());
         } else {
             $this->flashMessenger->addError(
-                $this->options->getMessagesOptions()->getMessage(MessagesOptions::AUTHENTICATION_FAIL_MESSAGE));
+                $this->options->getMessagesOptions()->getMessage(MessagesOptions::AUTHENTICATION_FAIL_MESSAGE)
+            );
         }
 
         return new RedirectResponse($request->getUri(), 303);

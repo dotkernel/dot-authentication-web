@@ -22,6 +22,30 @@ trait AuthenticationEventTrait
 {
     /**
      * @param AuthenticationInterface $authentication
+     * @param $error
+     * @param string $name
+     * @param array $eventParams
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return AuthenticationEvent
+     */
+    protected function createAuthenticationEventWithError(
+        AuthenticationInterface $authentication,
+        $error,
+        $name = AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED,
+        array $eventParams = [],
+        ServerRequestInterface $request = null,
+        ResponseInterface $response = null
+    ) {
+
+        $event = $this->createAuthenticationEvent($authentication, $name, $eventParams, $request, $response);
+        $event->setError($error);
+
+        return $event;
+    }
+
+    /**
+     * @param AuthenticationInterface $authentication
      * @param string $name
      * @param array $eventParams
      * @param ServerRequestInterface|null $request
@@ -46,30 +70,6 @@ trait AuthenticationEventTrait
             $event->setResponse($response);
         }
         $event->setParams(array_merge($event->getParams(), $eventParams));
-
-        return $event;
-    }
-
-    /**
-     * @param AuthenticationInterface $authentication
-     * @param $error
-     * @param string $name
-     * @param array $eventParams
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @return AuthenticationEvent
-     */
-    protected function createAuthenticationEventWithError(
-        AuthenticationInterface $authentication,
-        $error,
-        $name = AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED,
-        array $eventParams = [],
-        ServerRequestInterface $request,
-        ResponseInterface $response
-    ) {
-
-        $event = $this->createAuthenticationEvent($authentication, $name, $eventParams, $request, $response);
-        $event->setError($error);
 
         return $event;
     }

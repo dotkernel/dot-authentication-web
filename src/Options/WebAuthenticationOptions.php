@@ -11,7 +11,6 @@ namespace Dot\Authentication\Web\Options;
 
 use Dot\Authentication\Web\Exception\InvalidArgumentException;
 use Zend\Stdlib\AbstractOptions;
-use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class WebAuthenticationOptions
@@ -201,5 +200,4 @@ class WebAuthenticationOptions extends AbstractOptions
         }
         return $this;
     }
-
 }

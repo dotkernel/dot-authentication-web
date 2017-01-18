@@ -14,8 +14,8 @@ return [
                 'route_name' => 'login',
                 'route_params' => [],
                 'query_params' => [],
-                'fragment_identifier => '',
-                'options' => []
+                'fragment_identifier => null,
+                'route_options' => []
             ],
             'logout_route' => ['route_name' => 'logout', 'route_params' => []],
 

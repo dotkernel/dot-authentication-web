@@ -86,7 +86,10 @@ class LogoutAction
         $event = $this->createAuthenticationEvent(
             $this->authentication,
             AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT,
-            [], $request, $response);
+            [],
+            $request,
+            $response
+        );
 
         $result = $this->getEventManager()->triggerEventUntil(function ($r) {
             return ($r instanceof ResponseInterface);

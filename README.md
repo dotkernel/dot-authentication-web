@@ -22,40 +22,31 @@ In addition to registering the dependencies, the ConfigProvider does the followi
 ##### authentication-web.global.php
 ```php
 return [
-    //the same key as dot-authentication-service
     'dot_authentication' => [
-        //dot-authentication-web config
+        //this package's specific configuration template
         'web' => [
-            //specifies to the module, the login and logout routes
-            //these need to be changed only if routes where modified
+            //change next two only if you changed the default login/logout routes
             'login_route' => ['name' => 'login', 'params' => [], 'query_params' => []],
-            'logout_route' => ['name' => 'logout', 'params' => [], 'query_params' => []],
-            
-            //template name to use for the login page
+            'logout_route' => ['name' => 'logout', 'params' => []],
+
+            //template name to use for the login form
             'login_template' => 'app::login',
-            
-            //where to redirect after successfull login
-            //can be specified as a string(route name) or an array
-            'after_login_route' => 'home',
-            
-            //where to redirect after uses logs out
-            'after_logout_route' => ['name' => 'login'],
-            
-            //enabled by default, check if wanted url is in query params 
-            //and redirect to that instead if login successful
+
+            //where to redirect after login success
+            'after_login_route' => ['name' => 'my-account', 'params' => []],
+            //where to redirect after logging out
+            'after_logout_route' => ['name' => 'login', 'params' => []],
+
+            //enable the wanted url feature, to login to the previously requested uri after login
             'allow_redirect_param' => true,
             'redirect_param_name' => 'redirect',
-            
-            //for overwritting default module messages
+
+            //for overwriting default module messages
             'messages_options' => [
-                'messages' => [
-                    //MessagesOptions::AUTHENTICATION_FAIL_MESSAGE => 'Authentication failed. Check your credentials and try again',
-                    //MessagesOptions::UNAUTHORIZED_MESSAGE => 'You must be authenticated to access the requested content',
-                ],
+                'messages' => [],
             ],
-        ],
-    
-    ],
+        ]
+    ]
 ];
 ```
 

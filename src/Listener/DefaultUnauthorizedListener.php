@@ -95,9 +95,12 @@ class DefaultUnauthorizedListener
 
         /** @var Uri $uri */
         $uri = $this->routeHelper->getUri($this->options->getLoginRoute());
-        if($this->areUriEqual($uri, $request->getUri())) {
-            throw new RuntimeException('Default unauthorized listener has detected that the login route is not authorized either.'.
-                ' This can result in an endless redirect loop. Please edit your  authorization schema to open login route to guests');
+        if ($this->areUriEqual($uri, $request->getUri())) {
+            throw new RuntimeException(
+                'Default unauthorized listener has detected that the login route is not authorized either.' .
+                ' This can result in an endless redirect loop. ' .
+                'Please edit your  authorization schema to open login route to guests'
+            );
         }
         if ($this->options->isAllowRedirectParam()) {
             $uri = $this->appendQueryParam($uri, $request->getUri(), $this->options->getRedirectParamName());
@@ -127,9 +130,8 @@ class DefaultUnauthorizedListener
     protected function areUriEqual(UriInterface $uri1, UriInterface $uri2)
     {
         return $uri1->getScheme() === $uri2->getScheme()
-        && $uri1->getHost() === $uri2->getHost()
-        && $uri1->getPath() === $uri2->getPath()
-        && $uri1->getPort() === $uri2->getPort();
+            && $uri1->getHost() === $uri2->getHost()
+            && $uri1->getPath() === $uri2->getPath()
+            && $uri1->getPort() === $uri2->getPort();
     }
-
 }

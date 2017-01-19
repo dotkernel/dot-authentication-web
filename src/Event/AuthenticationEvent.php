@@ -107,5 +107,4 @@ class AuthenticationEvent extends Event
         $this->error = $error;
         return $this;
     }
-
 }

@@ -85,5 +85,4 @@ class DefaultLogoutListener extends AbstractListenerAggregate
         $uri = $this->routeHelper->getUri($this->options->getAfterLogoutRoute());
         return new RedirectResponse($uri);
     }
-
 }

@@ -56,7 +56,6 @@ class UnauthorizedHandler
         if ($error instanceof \Exception && in_array($error->getCode(), $this->statusCodes)
             || in_array($response->getStatusCode(), $this->statusCodes)
         ) {
-
             $result = $this->triggerUnauthorizedEvent($request, $response, $error);
             if ($result instanceof ResponseInterface) {
                 return $result;
@@ -77,7 +76,10 @@ class UnauthorizedHandler
             $this->authenticationService,
             $error,
             AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED,
-            [], $request, $response);
+            [],
+            $request,
+            $response
+        );
 
         $result = $this->getEventManager()->triggerEventUntil(function ($r) {
             return ($r instanceof ResponseInterface);
@@ -104,6 +106,4 @@ class UnauthorizedHandler
         $this->authenticationService = $authenticationService;
         return $this;
     }
-
-
 }

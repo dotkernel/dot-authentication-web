@@ -14,10 +14,6 @@
     "psr/http-message": "^1.0",
     "container-interop/container-interop": "^1.1",
 
-    "zendframework/zend-stdlib": "^3.1",
-    "zendframework/zend-diactoros": "^1.3",
-    "zendframework/zend-expressive-template": "^1.0",
-
     "dotkernel/dot-authentication": "0.6.x-dev",
     "dotkernel/dot-event": "0.6.x-dev",
     "dotkernel/dot-helpers": "0.6.x-dev",
@@ -25,7 +21,11 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^4.8",
-    "squizlabs/php_codesniffer": "^2.3"
+    "squizlabs/php_codesniffer": "^2.3",
+
+    "zendframework/zend-stdlib": "^3.1",
+    "zendframework/zend-diactoros": "^1.3",
+    "zendframework/zend-expressive-template": "^1.0"
   },
   "autoload": {
     "psr-4": {

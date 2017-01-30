@@ -7,6 +7,8 @@
  * Time: 8:40 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\AuthenticationInterface;

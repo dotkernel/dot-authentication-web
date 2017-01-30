@@ -7,6 +7,8 @@
  * Time: 3:49 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Event;
 
 use Dot\Authentication\AuthenticationInterface;
@@ -39,72 +41,64 @@ class AuthenticationEvent extends Event
     /**
      * @return IdentityInterface
      */
-    public function getIdentity()
+    public function getIdentity(): ?IdentityInterface
     {
         return $this->identity;
     }
 
     /**
      * @param IdentityInterface $identity
-     * @return AuthenticationEvent
      */
     public function setIdentity(IdentityInterface $identity)
     {
         $this->identity = $identity;
-        return $this;
     }
 
     /**
      * @return AuthenticationResult
      */
-    public function getAuthenticationResult()
+    public function getAuthenticationResult(): ?AuthenticationResult
     {
         return $this->result;
     }
 
     /**
      * @param AuthenticationResult $result
-     * @return AuthenticationEvent
      */
     public function setAuthenticationResult(AuthenticationResult $result)
     {
         $this->result = $result;
-        return $this;
     }
 
     /**
      * @return AuthenticationInterface
      */
-    public function getAuthenticationService()
+    public function getAuthenticationService(): AuthenticationInterface
     {
         return $this->authentication;
     }
 
     /**
      * @param AuthenticationInterface $authentication
-     * @return AuthenticationEvent
      */
     public function setAuthenticationService(AuthenticationInterface $authentication)
     {
         $this->authentication = $authentication;
-        return $this;
     }
 
     /**
      * @return mixed
      */
-    public function getError()
+    public function getError(): ?mixed
     {
         return $this->error;
     }
 
     /**
-     * @param mixed $error
-     * @return AuthenticationEvent
+     * @param mixed|null $error
      */
-    public function setError($error)
+    public function setError(mixed $error = null)
     {
         $this->error = $error;
-        return $this;
     }
 }

@@ -7,11 +7,12 @@
  * Time: 6:34 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web;
 
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -22,23 +23,21 @@ trait AuthenticationEventTrait
 {
     /**
      * @param AuthenticationInterface $authentication
-     * @param $error
+     * @param mixed $error
      * @param string $name
      * @param array $eventParams
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
      * @return AuthenticationEvent
      */
     protected function createAuthenticationEventWithError(
         AuthenticationInterface $authentication,
-        $error,
-        $name = AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED,
+        mixed $error,
+        string $name = AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED,
         array $eventParams = [],
-        ServerRequestInterface $request = null,
-        ResponseInterface $response = null
-    ) {
+        ServerRequestInterface $request = null
+    ): AuthenticationEvent {
 
-        $event = $this->createAuthenticationEvent($authentication, $name, $eventParams, $request, $response);
+        $event = $this->createAuthenticationEvent($authentication, $name, $eventParams, $request);
         $event->setError($error);
 
         return $event;
@@ -49,26 +48,24 @@ trait AuthenticationEventTrait
      * @param string $name
      * @param array $eventParams
      * @param ServerRequestInterface|null $request
-     * @param ResponseInterface|null $response
      * @return AuthenticationEvent
      */
     protected function createAuthenticationEvent(
         AuthenticationInterface $authentication,
-        $name = AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+        string $name = AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
         array $eventParams = [],
-        ServerRequestInterface $request = null,
-        ResponseInterface $response = null
-    ) {
+        ServerRequestInterface $request = null
+    ): AuthenticationEvent {
         $event = new AuthenticationEvent();
+
         $event->setName($name);
         $event->setTarget($this);
         $event->setAuthenticationService($authentication);
+
         if ($request) {
             $event->setRequest($request);
         }
-        if ($response) {
-            $event->setResponse($response);
-        }
+
         $event->setParams(array_merge($event->getParams(), $eventParams));
 
         return $event;

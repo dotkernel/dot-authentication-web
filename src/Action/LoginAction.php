@@ -7,6 +7,8 @@
  * Time: 8:37 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Action;
 
 use Dot\Authentication\AuthenticationInterface;
@@ -57,10 +59,13 @@ class LoginAction
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @param callable|null $next
-     * @return RedirectResponse
+     * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
-    {
+    public function __invoke(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ): ResponseInterface {
         if ($this->authentication->hasIdentity()) {
             return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLoginRoute()));
         }
@@ -70,30 +75,21 @@ class LoginAction
             $data = $request->getParsedBody();
         }
 
-        $result = $this->triggerAuthenticateEvent($request, $response, $data);
+        $result = $this->triggerAuthenticateEvent($request, $data);
         if ($result instanceof ResponseInterface) {
             return $result;
         }
 
-        error_log(
-            sprintf(
-                'Authentication event handlers should return a ResponseInterface, "%s" returned',
-                is_object($result) ? get_class($result) : gettype($result)
-            ),
-            E_USER_WARNING
-        );
-
         return $next($request, $response);
     }
 
-    public function triggerAuthenticateEvent(ServerRequestInterface $request, ResponseInterface $response, $data)
+    public function triggerAuthenticateEvent(ServerRequestInterface $request, array $data): ?ResponseInterface
     {
         $event = $this->createAuthenticationEvent(
             $this->authentication,
             AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
             $data,
-            $request,
-            $response
+            $request
         );
 
         $result = $this->getEventManager()->triggerEventUntil(function ($r) {

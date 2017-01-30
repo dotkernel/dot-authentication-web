@@ -7,6 +7,8 @@
  * Time: 8:12 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\AuthenticationInterface;
@@ -27,10 +29,10 @@ class DefaultLogoutListenerFactory
      */
     public function __invoke(ContainerInterface $container)
     {
-        $options = $container->get(WebAuthenticationOptions::class);
-        $authentication = $container->get(AuthenticationInterface::class);
-        $routeHelper = $container->get(RouteOptionHelper::class);
-
-        return new DefaultLogoutListener($authentication, $routeHelper, $options);
+        return new DefaultLogoutListener(
+            $container->get(AuthenticationInterface::class),
+            $container->get(RouteOptionHelper::class),
+            $container->get(WebAuthenticationOptions::class)
+        );
     }
 }

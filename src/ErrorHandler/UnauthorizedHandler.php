@@ -7,6 +7,8 @@
  * Time: 10:45 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\ErrorHandler;
 
 use Dot\Authentication\AuthenticationInterface;
@@ -52,7 +54,7 @@ class UnauthorizedHandler
         ServerRequestInterface $request,
         ResponseInterface $response,
         callable $next = null
-    ) {
+    ): ResponseInterface {
         if ($error instanceof \Exception && in_array($error->getCode(), $this->statusCodes)
             || in_array($response->getStatusCode(), $this->statusCodes)
         ) {
@@ -70,15 +72,14 @@ class UnauthorizedHandler
         return $next($request, $response, $error);
     }
 
-    public function triggerUnauthorizedEvent(ServerRequestInterface $request, ResponseInterface $response, $error)
+    public function triggerUnauthorizedEvent(ServerRequestInterface $request, $error): ?ResponseInterface
     {
         $event = $this->createAuthenticationEventWithError(
             $this->authenticationService,
             $error,
             AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED,
             [],
-            $request,
-            $response
+            $request
         );
 
         $result = $this->getEventManager()->triggerEventUntil(function ($r) {
@@ -92,18 +93,16 @@ class UnauthorizedHandler
     /**
      * @return AuthenticationInterface
      */
-    public function getAuthenticationService()
+    public function getAuthenticationService(): AuthenticationInterface
     {
         return $this->authenticationService;
     }
 
     /**
      * @param AuthenticationInterface $authenticationService
-     * @return UnauthorizedHandler
      */
-    public function setAuthenticationService($authenticationService)
+    public function setAuthenticationService(AuthenticationInterface $authenticationService)
     {
         $this->authenticationService = $authenticationService;
-        return $this;
     }
 }

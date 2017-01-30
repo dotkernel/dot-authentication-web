@@ -7,6 +7,8 @@
  * Time: 7:50 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Listener;
 
 use Dot\Authentication\Exception\UnauthorizedException;
@@ -17,6 +19,7 @@ use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
 use Dot\Helpers\Route\UriHelperTrait;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
@@ -59,13 +62,45 @@ class DefaultUnauthorizedListener
 
     /**
      * @param AuthenticationEvent $e
-     * @return RedirectResponse
+     * @return ResponseInterface
      * @throws \Exception
      */
-    public function __invoke(AuthenticationEvent $e)
+    public function __invoke(AuthenticationEvent $e): ResponseInterface
     {
         $request = $e->getRequest();
 
+        $messages = $this->getErrorMessages($e);
+        if (empty($messages)) {
+            $messages = [$this->options->getMessagesOptions()->getMessage(MessagesOptions::UNAUTHORIZED_MESSAGE)];
+        }
+
+        //add a flash message in case the login page displays errors
+        if ($this->flashMessenger) {
+            $this->flashMessenger->addError($messages);
+        }
+
+        /** @var Uri $uri */
+        $uri = $this->routeHelper->getUri($this->options->getLoginRoute());
+        if ($this->areUriEqual($uri, $request->getUri())) {
+            throw new RuntimeException(
+                'Default unauthorized listener has detected that the login route is not authorized either.' .
+                ' This can result in an endless redirect loop. ' .
+                'Please edit your  authorization schema to open login route to guests'
+            );
+        }
+        if ($this->options->isEnableWantedUrl()) {
+            $uri = $this->appendQueryParam($uri, $this->options->getWantedUrlName(), $request->getUri()->__toString());
+        }
+
+        return new RedirectResponse($uri);
+    }
+
+    /**
+     * @param AuthenticationEvent $e
+     * @return array
+     */
+    protected function getErrorMessages(AuthenticationEvent $e): array
+    {
         $messages = [];
         $error = $e->getError();
         if (is_array($error)) {
@@ -81,53 +116,31 @@ class DefaultUnauthorizedListener
                 $messages[] = $error->getMessage();
             }
         }
-
-        if (empty($messages)) {
-            $messages = [$this->options->getMessagesOptions()->getMessage(MessagesOptions::UNAUTHORIZED_MESSAGE)];
-        }
-
-        //add a flash message in case the login page displays errors
-        if ($this->flashMessenger) {
-            foreach ($messages as $message) {
-                $this->flashMessenger->addError($message);
-            }
-        }
-
-        /** @var Uri $uri */
-        $uri = $this->routeHelper->getUri($this->options->getLoginRoute());
-        if ($this->areUriEqual($uri, $request->getUri())) {
-            throw new RuntimeException(
-                'Default unauthorized listener has detected that the login route is not authorized either.' .
-                ' This can result in an endless redirect loop. ' .
-                'Please edit your  authorization schema to open login route to guests'
-            );
-        }
-        if ($this->options->isAllowRedirectParam()) {
-            $uri = $this->appendQueryParam($uri, $request->getUri(), $this->options->getRedirectParamName());
-        }
-
-        return new RedirectResponse($uri);
+        return $messages;
     }
 
     /**
      * @return boolean
      */
-    public function isDebug()
+    public function isDebug(): bool
     {
         return $this->debug;
     }
 
     /**
      * @param boolean $debug
-     * @return DefaultUnauthorizedListener
      */
-    public function setDebug($debug)
+    public function setDebug(bool $debug)
     {
         $this->debug = $debug;
-        return $this;
     }
 
-    protected function areUriEqual(UriInterface $uri1, UriInterface $uri2)
+    /**
+     * @param UriInterface $uri1
+     * @param UriInterface $uri2
+     * @return bool
+     */
+    protected function areUriEqual(UriInterface $uri1, UriInterface $uri2): bool
     {
         return $uri1->getScheme() === $uri2->getScheme()
             && $uri1->getHost() === $uri2->getHost()

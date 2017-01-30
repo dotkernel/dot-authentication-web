@@ -7,6 +7,8 @@
  * Time: 8:40 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\AuthenticationInterface;
@@ -38,10 +40,8 @@ class LoginActionFactory
         $defaultListeners = $container->get(DefaultAuthenticationListener::class);
         $defaultListeners->attach($eventManager);
 
-        $authentication = $container->get(AuthenticationInterface::class);
-
         $action = new LoginAction(
-            $authentication,
+            $container->get(AuthenticationInterface::class),
             $container->get(RouteOptionHelper::class),
             $container->get(WebAuthenticationOptions::class)
         );

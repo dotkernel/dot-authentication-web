@@ -7,6 +7,8 @@
  * Time: 9:36 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Options;
 
 use Dot\Authentication\Web\Exception\InvalidArgumentException;
@@ -19,155 +21,117 @@ use Zend\Stdlib\AbstractOptions;
 class WebAuthenticationOptions extends AbstractOptions
 {
     /** @var string|array */
-    protected $loginRoute = 'login';
+    protected $loginRoute = ['route_name' => 'login'];
 
     /** @var string|array */
-    protected $logoutRoute = 'logout';
+    protected $logoutRoute = ['route_name' => 'logout'];
 
     /** @var string|array */
-    protected $afterLoginRoute = 'home';
+    protected $afterLoginRoute = ['route_name' => 'home'];
 
     /** @var string|array */
-    protected $afterLogoutRoute = 'login';
+    protected $afterLogoutRoute = ['route_name' => 'login'];
 
     /** @var  string */
-    protected $loginTemplate;
+    protected $loginTemplate = '';
 
     /** @var bool */
-    protected $allowRedirectParam = true;
+    protected $enableWantedUrl = true;
 
     /** @var string */
-    protected $redirectParamName = 'redirect';
+    protected $wantedUrlName = 'redirect';
 
     /** @var  MessagesOptions */
     protected $messagesOptions;
 
-    protected $__strictMode__ = false;
+    /**
+     * WebAuthenticationOptions constructor.
+     * @param null $options
+     */
+    public function __construct($options = null)
+    {
+        $this->__strictMode__ = false;
+        parent::__construct($options);
+    }
 
     /**
-     * @return array|string
+     * @return array
      */
-    public function getLoginRoute()
+    public function getLoginRoute(): array
     {
         return $this->loginRoute;
     }
 
     /**
-     * @param array|string $loginRoute
-     * @return WebAuthenticationOptions
+     * @param array $loginRoute
      */
-    public function setLoginRoute($loginRoute)
+    public function setLoginRoute(array $loginRoute)
     {
         $this->loginRoute = $loginRoute;
-        return $this;
     }
 
     /**
-     * @return array|string
+     * @return array
      */
-    public function getLogoutRoute()
+    public function getLogoutRoute(): array
     {
         return $this->logoutRoute;
     }
 
     /**
-     * @param array|string $logoutRoute
-     * @return WebAuthenticationOptions
+     * @param array $logoutRoute
      */
-    public function setLogoutRoute($logoutRoute)
+    public function setLogoutRoute(array $logoutRoute)
     {
         $this->logoutRoute = $logoutRoute;
-        return $this;
     }
 
     /**
-     * @return array|string
+     * @return array
      */
-    public function getAfterLoginRoute()
+    public function getAfterLoginRoute(): array
     {
         return $this->afterLoginRoute;
     }
 
     /**
-     * @param array|string $afterLoginRoute
-     * @return WebAuthenticationOptions
+     * @param array $afterLoginRoute
      */
-    public function setAfterLoginRoute($afterLoginRoute)
+    public function setAfterLoginRoute(array $afterLoginRoute)
     {
         $this->afterLoginRoute = $afterLoginRoute;
-        return $this;
     }
 
     /**
-     * @return array|string
+     * @return array
      */
-    public function getAfterLogoutRoute()
+    public function getAfterLogoutRoute(): array
     {
         return $this->afterLogoutRoute;
     }
 
     /**
      * @param array|string $afterLogoutRoute
-     * @return WebAuthenticationOptions
      */
-    public function setAfterLogoutRoute($afterLogoutRoute)
+    public function setAfterLogoutRoute(array $afterLogoutRoute)
     {
         $this->afterLogoutRoute = $afterLogoutRoute;
-        return $this;
     }
 
     /**
      * @return string
      */
-    public function getLoginTemplate()
+    public function getLoginTemplate(): string
     {
-        return $this->loginTemplate;
+        return $this->loginTemplate ?? '';
     }
 
     /**
      * @param string $loginTemplate
-     * @return WebAuthenticationOptions
      */
-    public function setLoginTemplate($loginTemplate)
+    public function setLoginTemplate(string $loginTemplate)
     {
         $this->loginTemplate = $loginTemplate;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isAllowRedirectParam()
-    {
-        return $this->allowRedirectParam;
-    }
-
-    /**
-     * @param boolean $allowRedirectParam
-     * @return WebAuthenticationOptions
-     */
-    public function setAllowRedirectParam($allowRedirectParam)
-    {
-        $this->allowRedirectParam = $allowRedirectParam;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRedirectParamName()
-    {
-        return $this->redirectParamName;
-    }
-
-    /**
-     * @param string $redirectParamName
-     * @return WebAuthenticationOptions
-     */
-    public function setRedirectParamName($redirectParamName)
-    {
-        $this->redirectParamName = $redirectParamName;
-        return $this;
     }
 
     /**
@@ -199,5 +163,37 @@ class WebAuthenticationOptions extends AbstractOptions
             ));
         }
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnableWantedUrl(): bool
+    {
+        return $this->enableWantedUrl;
+    }
+
+    /**
+     * @param bool $enableWantedUrl
+     */
+    public function setEnableWantedUrl(bool $enableWantedUrl)
+    {
+        $this->enableWantedUrl = $enableWantedUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWantedUrlName(): string
+    {
+        return $this->wantedUrlName;
+    }
+
+    /**
+     * @param string $wantedUrlName
+     */
+    public function setWantedUrlName(string $wantedUrlName)
+    {
+        $this->wantedUrlName = $wantedUrlName;
     }
 }

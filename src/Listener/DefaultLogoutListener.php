@@ -7,12 +7,15 @@
  * Time: 7:36 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Listener;
 
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Helpers\Route\RouteOptionHelper;
+use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
@@ -70,17 +73,17 @@ class DefaultLogoutListener extends AbstractListenerAggregate
     /**
      * @param AuthenticationEvent $e
      */
-    public function logout(AuthenticationEvent $e)
+    public function logout(AuthenticationEvent $e): void
     {
         $this->authentication->clearIdentity();
     }
 
     /**
      * @param AuthenticationEvent $e
-     * @return RedirectResponse
+     * @return ResponseInterface
      * @throws \Exception
      */
-    public function logoutPost(AuthenticationEvent $e)
+    public function logoutPost(AuthenticationEvent $e): ResponseInterface
     {
         $uri = $this->routeHelper->getUri($this->options->getAfterLogoutRoute());
         return new RedirectResponse($uri);

@@ -7,6 +7,8 @@
  * Time: 4:24 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Listener;
 
 use Dot\Authentication\AuthenticationInterface;
@@ -15,8 +17,10 @@ use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Authentication\Web\Exception\RuntimeException;
 use Dot\Authentication\Web\Options\MessagesOptions;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
+use Dot\Authentication\Web\Utils;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
+use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
@@ -40,10 +44,13 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
     protected $authentication;
 
     /** @var  WebAuthenticationOptions */
-    protected $options;
+    protected $webAuthOptions;
 
     /** @var  FlashMessengerInterface */
     protected $flashMessenger;
+
+    /** @var  bool */
+    protected $debug = false;
 
     /**
      * DefaultAuthenticationListener constructor.
@@ -51,19 +58,19 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
      * @param TemplateRendererInterface $template
      * @param RouteOptionHelper $routeHelper
      * @param FlashMessengerInterface $flashMessenger
-     * @param WebAuthenticationOptions $options
+     * @param WebAuthenticationOptions $webAuthOptions
      */
     public function __construct(
         AuthenticationInterface $authentication,
         TemplateRendererInterface $template,
         RouteOptionHelper $routeHelper,
         FlashMessengerInterface $flashMessenger,
-        WebAuthenticationOptions $options
+        WebAuthenticationOptions $webAuthOptions
     ) {
         $this->authentication = $authentication;
         $this->routeHelper = $routeHelper;
         $this->template = $template;
-        $this->options = $options;
+        $this->webAuthOptions = $webAuthOptions;
         $this->flashMessenger = $flashMessenger;
     }
 
@@ -71,7 +78,7 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
      * @param EventManagerInterface $events
      * @param int $priority
      */
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(
             AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
@@ -95,7 +102,7 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
     /**
      * @param AuthenticationEvent $e
      */
-    public function prepare(AuthenticationEvent $e)
+    public function prepare(AuthenticationEvent $e): void
     {
         //nothing to prepare for now, let it to implementors
     }
@@ -103,87 +110,84 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
     /**
      * @param AuthenticationEvent $e
      */
-    public function authenticate(AuthenticationEvent $e)
+    public function authenticate(AuthenticationEvent $e): void
     {
         $request = $e->getRequest();
-        $response = $e->getResponse();
         $error = $e->getError();
+
         if ($request->getMethod() === 'POST' && empty($error)) {
-            $result = $this->authentication->authenticate($request, $response);
+            $result = $this->authentication->authenticate($request);
             //we get this in case authentication skipped(due to missing credentials in request)
             //but for web application, we want to force implemetors to prepare their auth adapter first
             //so we throw an exception to be clear developers have missed something
-            if ($result === false) {
+            if ($result->getCode() === AuthenticationResult::FAILURE_MISSING_CREDENTIALS) {
                 throw new RuntimeException('Authentication service could not authenticate request. ' .
                     'Have you forgot to prepare the request first according to authentication adapter needs?');
             }
 
-            if ($result instanceof AuthenticationResult) {
-                $e->setAuthenticationResult($result);
+            $e->setAuthenticationResult($result);
 
-                if ($result->isValid()) {
-                    $e->setIdentity($result->getIdentity());
-                } else {
-                    $e->setError($result->getMessage());
-                }
-
-                //set the possibly modified PSR7 messages to the event
-                if ($result->getRequest()) {
-                    $e->setRequest($result->getRequest());
-                }
-
-                if ($result->getResponse()) {
-                    $e->setResponse($result->getResponse());
-                }
+            if ($result->isValid()) {
+                $e->setIdentity($result->getIdentity());
+            } else {
+                $e->setError(
+                    $this->webAuthOptions->getMessagesOptions()
+                        ->getMessage(Utils::$authResultCodeToMessageMap[$result->getCode()])
+                );
             }
         }
     }
 
     /**
      * @param AuthenticationEvent $e
-     * @return HtmlResponse|RedirectResponse
+     * @return ResponseInterface
      * @throws \Exception
      */
-    public function authenticationPost(AuthenticationEvent $e)
+    public function authenticationPost(AuthenticationEvent $e): ResponseInterface
     {
         $request = $e->getRequest();
+
         if ($request->getMethod() === 'POST') {
-            $error = $e->getError();
-            if (!empty($error)) {
-                return $this->prgRedirect($e);
-            }
-
             $result = $e->getAuthenticationResult();
-            if ($result && $result->isValid()) {
-                $uri = $this->routeHelper->getUri($this->options->getAfterLoginRoute());
+            if ($result->isValid()) {
+                $uri = $this->routeHelper->getUri($this->webAuthOptions->getAfterLoginRoute());
 
-                if ($this->options->isAllowRedirectParam()) {
-                    $params = $e->getRequest()->getQueryParams();
-                    $redirectParam = $this->options->getRedirectParamName();
+                if ($this->webAuthOptions->isEnableWantedUrl()) {
+                    $params = $request->getQueryParams();
+                    $wantedUrlName = $this->webAuthOptions->getWantedUrlName();
 
-                    if (isset($params[$redirectParam]) && !empty($params[$redirectParam])) {
-                        $uri = new Uri(urldecode($params[$redirectParam]));
+                    if (isset($params[$wantedUrlName]) && !empty($params[$wantedUrlName])) {
+                        $uri = new Uri(urldecode($params[$wantedUrlName]));
                     }
                 }
 
                 return new RedirectResponse($uri);
             }
+
+            //in this point, authentication result is not valid, redirect back to login with error
+            return $this->prgRedirect($e);
         }
 
         return $this->renderTemplate($e);
     }
 
-    protected function prgRedirect(AuthenticationEvent $e)
+    /**
+     * @param AuthenticationEvent $e
+     * @return ResponseInterface
+     */
+    protected function prgRedirect(AuthenticationEvent $e): ResponseInterface
     {
         $request = $e->getRequest();
         $error = $e->getError();
+
         if (is_array($error) || is_string($error)) {
             $this->flashMessenger->addError($error);
-        } elseif ($error instanceof \Exception) {
+        } elseif ($error instanceof \Exception && $this->isDebug()) {
             $this->flashMessenger->addError($error->getMessage());
         } else {
             $this->flashMessenger->addError(
-                $this->options->getMessagesOptions()->getMessage(MessagesOptions::AUTHENTICATION_FAIL_MESSAGE)
+                $this->webAuthOptions->getMessagesOptions()
+                    ->getMessage(MessagesOptions::AUTHENTICATION_FAIL_UNKNOWN)
             );
         }
 
@@ -191,11 +195,32 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
     }
 
     /**
-     * @param AuthenticationEvent $e
-     * @return HtmlResponse
+     * @return bool
      */
-    protected function renderTemplate(AuthenticationEvent $e)
+    public function isDebug(): bool
     {
-        return new HtmlResponse($this->template->render($this->options->getLoginTemplate(), $e->getParams()));
+        return $this->debug;
+    }
+
+    /**
+     * @param bool $debug
+     */
+    public function setDebug(bool $debug)
+    {
+        $this->debug = $debug;
+    }
+
+    /**
+     * @param AuthenticationEvent $e
+     * @return ResponseInterface
+     */
+    protected function renderTemplate(AuthenticationEvent $e): ResponseInterface
+    {
+        return new HtmlResponse(
+            $this->template->render(
+                $this->webAuthOptions->getLoginTemplate(),
+                $e->getParams()
+            )
+        );
     }
 }

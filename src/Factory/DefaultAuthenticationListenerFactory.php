@@ -7,6 +7,8 @@
  * Time: 8:05 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\AuthenticationInterface;
@@ -29,20 +31,17 @@ class DefaultAuthenticationListenerFactory
      */
     public function __invoke(ContainerInterface $container)
     {
-        $options = $container->get(WebAuthenticationOptions::class);
-        $authentication = $container->get(AuthenticationInterface::class);
-        $template = $container->get(TemplateRendererInterface::class);
-        $routeHelper = $container->get(RouteOptionHelper::class);
-        $flashMessenger = $container->get(FlashMessengerInterface::class);
-
         $listener = new DefaultAuthenticationListener(
-            $authentication,
-            $template,
-            $routeHelper,
-            $flashMessenger,
-            $options
+            $container->get(AuthenticationInterface::class),
+            $container->get(TemplateRendererInterface::class),
+            $container->get(RouteOptionHelper::class),
+            $container->get(FlashMessengerInterface::class),
+            $container->get(WebAuthenticationOptions::class)
         );
 
+        $config = $container->get('config');
+        $debug = $config['debug'] ?? false;
+        $listener->setDebug($debug);
         return $listener;
     }
 }

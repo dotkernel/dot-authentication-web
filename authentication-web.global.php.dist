@@ -25,6 +25,13 @@ return [
             'enable_wanted_url' => true,
             'wanted_url_name' => 'redirect',
 
+            'event_listeners' => [
+                /*[
+                    'type' => 'Class or service name',
+                    'priority' => 1,
+                ],*/
+            ],
+
             //for overwriting default module messages
             'messages_options' => [
                 'messages' => [

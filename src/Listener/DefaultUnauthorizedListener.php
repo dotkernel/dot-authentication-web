@@ -103,14 +103,13 @@ class DefaultUnauthorizedListener
     {
         $messages = [];
         $error = $e->getError();
-        if (is_array($error)) {
+        if (is_array($error) || is_string($error)) {
+            $error = (array)$error;
             foreach ($error as $e) {
                 if (is_string($e)) {
                     $messages[] = $e;
                 }
             }
-        } elseif (is_string($error)) {
-            $messages[] = $error;
         } elseif ($error instanceof \Exception) {
             if ($this->isDebug() || $error instanceof UnauthorizedException) {
                 $messages[] = $error->getMessage();

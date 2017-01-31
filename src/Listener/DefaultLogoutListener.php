@@ -55,7 +55,7 @@ class DefaultLogoutListener extends AbstractListenerAggregate
      * @param EventManagerInterface $events
      * @param int $priority
      */
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(
             AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT,

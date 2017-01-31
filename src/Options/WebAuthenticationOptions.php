@@ -11,7 +11,6 @@ declare(strict_types = 1);
 
 namespace Dot\Authentication\Web\Options;
 
-use Dot\Authentication\Web\Exception\InvalidArgumentException;
 use Zend\Stdlib\AbstractOptions;
 
 /**
@@ -40,6 +39,9 @@ class WebAuthenticationOptions extends AbstractOptions
 
     /** @var string */
     protected $wantedUrlName = 'redirect';
+
+    /** @var array */
+    protected $eventListeners = [];
 
     /** @var  MessagesOptions */
     protected $messagesOptions;
@@ -137,7 +139,7 @@ class WebAuthenticationOptions extends AbstractOptions
     /**
      * @return MessagesOptions
      */
-    public function getMessagesOptions()
+    public function getMessagesOptions(): MessagesOptions
     {
         if (!$this->messagesOptions) {
             $this->setMessagesOptions([]);
@@ -147,22 +149,10 @@ class WebAuthenticationOptions extends AbstractOptions
 
     /**
      * @param MessagesOptions|array $messagesOptions
-     * @return WebAuthenticationOptions
      */
-    public function setMessagesOptions($messagesOptions)
+    public function setMessagesOptions(array $messagesOptions)
     {
-        if (is_array($messagesOptions)) {
-            $this->messagesOptions = new MessagesOptions($messagesOptions);
-        } elseif ($messagesOptions instanceof MessagesOptions) {
-            $this->messagesOptions = $messagesOptions;
-        } else {
-            throw new InvalidArgumentException(sprintf(
-                'MessageOptions should be an array or an %s object. %s provided.',
-                MessagesOptions::class,
-                is_object($messagesOptions) ? get_class($messagesOptions) : gettype($messagesOptions)
-            ));
-        }
-        return $this;
+        $this->messagesOptions = new MessagesOptions($messagesOptions);
     }
 
     /**
@@ -195,5 +185,21 @@ class WebAuthenticationOptions extends AbstractOptions
     public function setWantedUrlName(string $wantedUrlName)
     {
         $this->wantedUrlName = $wantedUrlName;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEventListeners(): array
+    {
+        return $this->eventListeners;
+    }
+
+    /**
+     * @param array $eventListeners
+     */
+    public function setEventListeners(array $eventListeners)
+    {
+        $this->eventListeners = $eventListeners;
     }
 }

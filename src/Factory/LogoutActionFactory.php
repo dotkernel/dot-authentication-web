@@ -13,6 +13,8 @@ namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\Action\LogoutAction;
+use Dot\Authentication\Web\AuthenticationEventListenerAwareFactoryTrait;
+use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Authentication\Web\Listener\DefaultLogoutListener;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Helpers\Route\RouteOptionHelper;
@@ -26,26 +28,39 @@ use Zend\EventManager\EventManagerInterface;
  */
 class LogoutActionFactory
 {
+    use AuthenticationEventListenerAwareFactoryTrait;
+
+    public function __construct()
+    {
+        $this->eventListenersConfigKey = 'logout';
+    }
+
     /**
      * @param ContainerInterface $container
      * @return LogoutAction
      */
     public function __invoke(ContainerInterface $container)
     {
-        $eventManager = $container->has(EventManagerInterface::class)
-            ? $container->get(EventManagerInterface::class)
-            : new EventManager();
-
-        $defaultListeners = $container->get(DefaultLogoutListener::class);
-        $defaultListeners->attach($eventManager);
-
         $action = new LogoutAction(
             $container->get(AuthenticationInterface::class),
             $container->get(RouteOptionHelper::class),
             $container->get(WebAuthenticationOptions::class)
         );
 
+        $eventManager = $container->has(EventManagerInterface::class)
+            ? $container->get(EventManagerInterface::class)
+            : new EventManager();
+
         $action->setEventManager($eventManager);
+
+        $defaultListeners = $container->get(DefaultLogoutListener::class);
+        $defaultListeners->attach($eventManager);
+
+        $this->attachAuthenticationListeners(
+            $container,
+            $action,
+            AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT
+        );
 
         return $action;
     }

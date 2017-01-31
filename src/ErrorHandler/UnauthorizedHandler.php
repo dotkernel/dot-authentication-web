@@ -14,17 +14,18 @@ namespace Dot\Authentication\Web\ErrorHandler;
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\AuthenticationEventTrait;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
+use Dot\Authentication\Web\Event\AuthenticationEventListenerAwareInterface;
+use Dot\Authentication\Web\Event\AuthenticationEventListenerAwareTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\EventManager\EventManagerAwareTrait;
 
 /**
  * Class UnauthorizedHandler
  * @package Dot\Authentication\Web\ErrorHandler
  */
-class UnauthorizedHandler
+class UnauthorizedHandler implements AuthenticationEventListenerAwareInterface
 {
-    use EventManagerAwareTrait;
+    use AuthenticationEventListenerAwareTrait;
     use AuthenticationEventTrait;
 
     /** @var  AuthenticationInterface */

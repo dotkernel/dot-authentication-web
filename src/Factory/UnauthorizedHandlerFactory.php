@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\AuthenticationInterface;
+use Dot\Authentication\Web\AuthenticationEventListenerAwareFactoryTrait;
 use Dot\Authentication\Web\ErrorHandler\UnauthorizedHandler;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Authentication\Web\Listener\DefaultUnauthorizedListener;
@@ -25,21 +26,34 @@ use Zend\EventManager\EventManagerInterface;
  */
 class UnauthorizedHandlerFactory
 {
+    use AuthenticationEventListenerAwareFactoryTrait;
+
+    public function __construct()
+    {
+        $this->eventListenersConfigKey = 'unauthorized';
+    }
+
     /**
      * @param ContainerInterface $container
      * @return UnauthorizedHandler
      */
     public function __invoke(ContainerInterface $container)
     {
+        $handler = new UnauthorizedHandler($container->get(AuthenticationInterface::class));
+
         $eventManager = $container->has(EventManagerInterface::class)
             ? $container->get(EventManagerInterface::class)
             : new EventManager();
+        $handler->setEventManager($eventManager);
 
         $defaultListener = $container->get(DefaultUnauthorizedListener::class);
         $eventManager->attach(AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED, $defaultListener, 1);
 
-        $handler = new UnauthorizedHandler($container->get(AuthenticationInterface::class));
-        $handler->setEventManager($eventManager);
+        $this->attachAuthenticationListeners(
+            $container,
+            $handler,
+            AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED
+        );
 
         return $handler;
     }

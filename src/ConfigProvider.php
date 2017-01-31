@@ -61,6 +61,8 @@ class ConfigProvider
 
             'dot_authentication' => [
                 'web' => [
+                    'event_listeners' => [],
+
                     'login_route' => ['route_name' => 'login'],
                     'logout_route' => ['route_name' => 'logout'],
 

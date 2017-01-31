@@ -14,20 +14,21 @@ namespace Dot\Authentication\Web\Action;
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\AuthenticationEventTrait;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
+use Dot\Authentication\Web\Event\AuthenticationEventListenerAwareInterface;
+use Dot\Authentication\Web\Event\AuthenticationEventListenerAwareTrait;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Helpers\Route\RouteOptionHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\RedirectResponse;
-use Zend\EventManager\EventManagerAwareTrait;
 
 /**
  * Class LoginAction
  * @package Dot\Authentication\Web\Action
  */
-class LoginAction
+class LoginAction implements AuthenticationEventListenerAwareInterface
 {
-    use EventManagerAwareTrait;
+    use AuthenticationEventListenerAwareTrait;
     use AuthenticationEventTrait;
 
     /** @var  AuthenticationInterface */

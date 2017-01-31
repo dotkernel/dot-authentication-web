@@ -35,11 +35,13 @@ class UnauthorizedHandlerFactory
 
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return UnauthorizedHandler
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName)
     {
-        $handler = new UnauthorizedHandler($container->get(AuthenticationInterface::class));
+        /** @var UnauthorizedHandler $handler */
+        $handler = new $requestedName($container->get(AuthenticationInterface::class));
 
         $eventManager = $container->has(EventManagerInterface::class)
             ? $container->get(EventManagerInterface::class)

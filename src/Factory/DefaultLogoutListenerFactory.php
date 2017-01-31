@@ -25,11 +25,12 @@ class DefaultLogoutListenerFactory
 {
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return DefaultLogoutListener
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName)
     {
-        return new DefaultLogoutListener(
+        return new $requestedName(
             $container->get(AuthenticationInterface::class),
             $container->get(RouteOptionHelper::class),
             $container->get(WebAuthenticationOptions::class)

@@ -37,15 +37,17 @@ class LoginActionFactory
 
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return LoginAction
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName)
     {
         $eventManager = $container->has(EventManagerInterface::class)
             ? $container->get(EventManagerInterface::class)
             : new EventManager();
 
-        $action = new LoginAction(
+        /** @var LoginAction $action */
+        $action = new $requestedName(
             $container->get(AuthenticationInterface::class),
             $container->get(RouteOptionHelper::class),
             $container->get(WebAuthenticationOptions::class)

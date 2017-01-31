@@ -22,11 +22,12 @@ class WebAuthenticationOptionsFactory
 {
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return WebAuthenticationOptions
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName)
     {
         $config = $container->get('config')['dot_authentication']['web'];
-        return new WebAuthenticationOptions($config);
+        return new $requestedName($config);
     }
 }

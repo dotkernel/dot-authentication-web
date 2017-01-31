@@ -27,11 +27,13 @@ class DefaultAuthenticationListenerFactory
 {
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return DefaultAuthenticationListener
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName)
     {
-        $listener = new DefaultAuthenticationListener(
+        /** @var DefaultAuthenticationListener $listener */
+        $listener = new $requestedName(
             $container->get(AuthenticationInterface::class),
             $container->get(TemplateRendererInterface::class),
             $container->get(RouteOptionHelper::class),

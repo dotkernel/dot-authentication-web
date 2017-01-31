@@ -25,14 +25,16 @@ class DefaultUnauthorizedListenerFactory
 {
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return DefaultUnauthorizedListener
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName)
     {
         $config = $container->get('config');
         $debug = $config['debug'] ?? false;
 
-        $listener = new DefaultUnauthorizedListener(
+        /** @var DefaultUnauthorizedListener $listener */
+        $listener = new $requestedName(
             $container->get(RouteOptionHelper::class),
             $container->get(FlashMessengerInterface::class),
             $container->get(WebAuthenticationOptions::class)

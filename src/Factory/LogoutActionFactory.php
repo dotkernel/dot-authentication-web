@@ -37,11 +37,13 @@ class LogoutActionFactory
 
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return LogoutAction
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName)
     {
-        $action = new LogoutAction(
+        /** @var LogoutAction $action */
+        $action = new $requestedName(
             $container->get(AuthenticationInterface::class),
             $container->get(RouteOptionHelper::class),
             $container->get(WebAuthenticationOptions::class)

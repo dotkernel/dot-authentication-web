@@ -82,12 +82,6 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
     {
         $this->listeners[] = $events->attach(
             AuthenticationEvent::EVENT_AUTHENTICATE,
-            [$this, 'prepare'],
-            1000
-        );
-
-        $this->listeners[] = $events->attach(
-            AuthenticationEvent::EVENT_AUTHENTICATE,
             [$this, 'authenticate'],
             1
         );
@@ -97,14 +91,6 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
             [$this, 'authenticationPost'],
             -1000
         );
-    }
-
-    /**
-     * @param AuthenticationEvent $e
-     */
-    public function prepare(AuthenticationEvent $e): void
-    {
-        //nothing to prepare for now, let it to implementors
     }
 
     /**

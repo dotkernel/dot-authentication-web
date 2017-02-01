@@ -69,7 +69,7 @@ return [
                     //MessagesOptions::AUTHENTICATION_FAIL_UNKNOWN =>
                     //    'Authentication failed. Check your credentials and try again',
 
-                    //MessagesOptions::UNAUTHORIZED_MESSAGE => 'You must sign in first to access the requested content',
+                    //MessagesOptions::UNAUTHORIZED => 'You must sign in first to access the requested content',
                 ],
             ],
         ]

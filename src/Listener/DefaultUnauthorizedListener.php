@@ -71,7 +71,7 @@ class DefaultUnauthorizedListener
 
         $messages = $this->getErrorMessages($e);
         if (empty($messages)) {
-            $messages = [$this->options->getMessagesOptions()->getMessage(MessagesOptions::UNAUTHORIZED_MESSAGE)];
+            $messages = [$this->options->getMessagesOptions()->getMessage(MessagesOptions::UNAUTHORIZED)];
         }
 
         //add a flash message in case the login page displays errors

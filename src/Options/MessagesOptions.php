@@ -29,7 +29,7 @@ class MessagesOptions extends AbstractOptions
     const AUTHENTICATION_SUCCESS = 6;
     const AUTHENTICATION_FAIL_UNKNOWN = 7;
 
-    const UNAUTHORIZED_MESSAGE = 8;
+    const UNAUTHORIZED = 8;
 
     protected $messages = [
         MessagesOptions::AUTHENTICATION_FAILURE =>
@@ -56,7 +56,7 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::AUTHENTICATION_FAIL_UNKNOWN =>
             'Authentication failed. Check your credentials and try again',
 
-        MessagesOptions::UNAUTHORIZED_MESSAGE => 'You must sign in first to access the requested content',
+        MessagesOptions::UNAUTHORIZED => 'You must sign in first to access the requested content',
     ];
 
     /**

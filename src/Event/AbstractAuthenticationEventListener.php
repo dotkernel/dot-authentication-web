@@ -72,6 +72,4 @@ abstract class AbstractAuthenticationEventListener extends AbstractListenerAggre
     {
         // NOOP: defined by implementors
     }
-
-
 }

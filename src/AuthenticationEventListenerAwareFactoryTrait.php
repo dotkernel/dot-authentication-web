@@ -23,8 +23,6 @@ use Interop\Container\ContainerInterface;
  */
 trait AuthenticationEventListenerAwareFactoryTrait
 {
-    protected $eventListenersConfigKey;
-
     /**
      * @param ContainerInterface $container
      * @param AuthenticationEventListenerAwareInterface $action
@@ -39,10 +37,10 @@ trait AuthenticationEventListenerAwareFactoryTrait
         $moduleOptions = $container->get(WebAuthenticationOptions::class);
 
         $authenticationListeners = $moduleOptions->getEventListeners();
-        if (isset($authenticationListeners[$this->eventListenersConfigKey])
-            && is_array($authenticationListeners[$this->eventListenersConfigKey])
+        if (isset($authenticationListeners[$eventName])
+            && is_array($authenticationListeners[$eventName])
         ) {
-            foreach ($authenticationListeners as $listenerConfig) {
+            foreach ($authenticationListeners[$eventName] as $listenerConfig) {
                 if (is_array($listenerConfig)) {
                     $listener = $listenerConfig['type'] ?? '';
                     $priority = (int)($listenerConfig['priority'] ?? 1);
@@ -53,6 +51,12 @@ trait AuthenticationEventListenerAwareFactoryTrait
                         $priority,
                         $eventName
                     );
+                } elseif (is_string($listenerConfig)) {
+                    $type = $listenerConfig;
+                    $priority = -2000;
+
+                    $listener = $this->getListenerObject($container, $type);
+                    $action->attachListener($listener, $priority, $eventName);
                 }
             }
         }

@@ -29,7 +29,7 @@ abstract class AbstractAuthenticationEventListener extends AbstractListenerAggre
         }
 
         switch ($name) {
-            case AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE:
+            case AuthenticationEvent::EVENT_AUTHENTICATE:
                 $this->listeners[] = $events->attach(
                     $name,
                     [$this, 'onAuthenticate'],
@@ -37,7 +37,7 @@ abstract class AbstractAuthenticationEventListener extends AbstractListenerAggre
                 );
                 break;
 
-            case AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT:
+            case AuthenticationEvent::EVENT_LOGOUT:
                 $this->listeners[] = $events->attach(
                     $name,
                     [$this, 'onLogout'],
@@ -45,7 +45,7 @@ abstract class AbstractAuthenticationEventListener extends AbstractListenerAggre
                 );
                 break;
 
-            case AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED:
+            case AuthenticationEvent::EVENT_UNAUTHORIZED:
                 $this->listeners[] = $events->attach(
                     $name,
                     [$this, 'onUnauthorized'],

@@ -30,11 +30,6 @@ class LoginActionFactory
 {
     use AuthenticationEventListenerAwareFactoryTrait;
 
-    public function __construct()
-    {
-        $this->eventListenersConfigKey = 'authenticate';
-    }
-
     /**
      * @param ContainerInterface $container
      * @param $requestedName
@@ -61,7 +56,7 @@ class LoginActionFactory
         $this->attachAuthenticationListeners(
             $container,
             $action,
-            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE
+            AuthenticationEvent::EVENT_AUTHENTICATE
         );
 
         return $action;

@@ -88,7 +88,7 @@ class LoginAction implements AuthenticationEventListenerAwareInterface
     {
         $event = $this->createAuthenticationEvent(
             $this->authentication,
-            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+            AuthenticationEvent::EVENT_AUTHENTICATE,
             $data,
             $request
         );

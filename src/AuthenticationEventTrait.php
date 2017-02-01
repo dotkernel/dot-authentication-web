@@ -32,7 +32,7 @@ trait AuthenticationEventTrait
     protected function createAuthenticationEventWithError(
         AuthenticationInterface $authentication,
         mixed $error,
-        string $name = AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED,
+        string $name = AuthenticationEvent::EVENT_UNAUTHORIZED,
         array $eventParams = [],
         ServerRequestInterface $request = null
     ): AuthenticationEvent {
@@ -52,7 +52,7 @@ trait AuthenticationEventTrait
      */
     protected function createAuthenticationEvent(
         AuthenticationInterface $authentication,
-        string $name = AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+        string $name = AuthenticationEvent::EVENT_AUTHENTICATE,
         array $eventParams = [],
         ServerRequestInterface $request = null
     ): AuthenticationEvent {

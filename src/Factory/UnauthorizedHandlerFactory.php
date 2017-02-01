@@ -28,11 +28,6 @@ class UnauthorizedHandlerFactory
 {
     use AuthenticationEventListenerAwareFactoryTrait;
 
-    public function __construct()
-    {
-        $this->eventListenersConfigKey = 'unauthorized';
-    }
-
     /**
      * @param ContainerInterface $container
      * @param $requestedName
@@ -49,12 +44,12 @@ class UnauthorizedHandlerFactory
         $handler->setEventManager($eventManager);
 
         $defaultListener = $container->get(DefaultUnauthorizedListener::class);
-        $eventManager->attach(AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED, $defaultListener, 1);
+        $eventManager->attach(AuthenticationEvent::EVENT_UNAUTHORIZED, $defaultListener, 1);
 
         $this->attachAuthenticationListeners(
             $container,
             $handler,
-            AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED
+            AuthenticationEvent::EVENT_UNAUTHORIZED
         );
 
         return $handler;

@@ -81,19 +81,19 @@ class DefaultAuthenticationListener extends AbstractListenerAggregate
     public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(
-            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+            AuthenticationEvent::EVENT_AUTHENTICATE,
             [$this, 'prepare'],
             1000
         );
 
         $this->listeners[] = $events->attach(
-            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+            AuthenticationEvent::EVENT_AUTHENTICATE,
             [$this, 'authenticate'],
             1
         );
 
         $this->listeners[] = $events->attach(
-            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
+            AuthenticationEvent::EVENT_AUTHENTICATE,
             [$this, 'authenticationPost'],
             -1000
         );

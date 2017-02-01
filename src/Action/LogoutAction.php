@@ -83,7 +83,7 @@ class LogoutAction implements AuthenticationEventListenerAwareInterface
     {
         $event = $this->createAuthenticationEvent(
             $this->authentication,
-            AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT,
+            AuthenticationEvent::EVENT_LOGOUT,
             [],
             $request
         );

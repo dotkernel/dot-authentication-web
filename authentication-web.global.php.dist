@@ -26,19 +26,25 @@ return [
             'wanted_url_name' => 'redirect',
 
             'event_listeners' => [
-                'authenticate' => [
+                AuthenticationEvent::EVENT_AUTHENTICATE => [
                     [
                         'type' => 'Some\Class\Or\Service',
                         'priority' => 1
                     ]
                 ],
 
-                'logout' => [
-
+                AuthenticationEvent::EVENT_LOGOUT => [
+                     [
+                        'type' => 'Some\Class\Or\Service',
+                        'priority' => 1
+                     ]
                 ],
 
-                'unauthorized' => [
-
+                AuthenticationEvent::EVENT_UNAUTHORIZED => [
+                     [
+                        'type' => 'Some\Class\Or\Service',
+                        'priority' => 1
+                     ]
                 ]
             ],
 

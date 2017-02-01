@@ -22,9 +22,9 @@ use Dot\Event\Event;
  */
 class AuthenticationEvent extends Event
 {
-    const EVENT_AUTHENTICATION_AUTHENTICATE = 'event.authentication.authenticate';
-    const EVENT_AUTHENTICATION_LOGOUT = 'event.authentication.logout';
-    const EVENT_AUTHENTICATION_UNAUTHORIZED = 'event.authentication.unauthorized';
+    const EVENT_AUTHENTICATE = 'event.authentication.authenticate';
+    const EVENT_LOGOUT = 'event.authentication.logout';
+    const EVENT_UNAUTHORIZED = 'event.authentication.unauthorized';
 
     /** @var  IdentityInterface */
     protected $identity;

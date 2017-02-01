@@ -30,11 +30,6 @@ class LogoutActionFactory
 {
     use AuthenticationEventListenerAwareFactoryTrait;
 
-    public function __construct()
-    {
-        $this->eventListenersConfigKey = 'logout';
-    }
-
     /**
      * @param ContainerInterface $container
      * @param $requestedName
@@ -61,7 +56,7 @@ class LogoutActionFactory
         $this->attachAuthenticationListeners(
             $container,
             $action,
-            AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT
+            AuthenticationEvent::EVENT_LOGOUT
         );
 
         return $action;

@@ -78,7 +78,7 @@ class UnauthorizedHandler implements AuthenticationEventListenerAwareInterface
         $event = $this->createAuthenticationEventWithError(
             $this->authenticationService,
             $error,
-            AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED,
+            AuthenticationEvent::EVENT_UNAUTHORIZED,
             [],
             $request
         );

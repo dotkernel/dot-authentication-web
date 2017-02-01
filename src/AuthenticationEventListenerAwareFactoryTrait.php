@@ -43,7 +43,7 @@ trait AuthenticationEventListenerAwareFactoryTrait
             foreach ($authenticationListeners[$eventName] as $listenerConfig) {
                 if (is_array($listenerConfig)) {
                     $listener = $listenerConfig['type'] ?? '';
-                    $priority = (int)($listenerConfig['priority'] ?? 1);
+                    $priority = (int)($listenerConfig['priority'] ?? -2000);
 
                     $listener = $this->getListenerObject($container, $listener);
                     $action->attachListener(

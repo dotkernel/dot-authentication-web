@@ -40,6 +40,11 @@ trait AuthenticationEventListenerTrait
             $priority
         );
         $this->listeners[] = $events->attach(
+            AuthenticationEvent::EVENT_AUTHENTICATION_SUCCESS,
+            [$this, 'onAuthenticationSuccess'],
+            $priority
+        );
+        $this->listeners[] = $events->attach(
             AuthenticationEvent::EVENT_AUTHENTICATION_ERROR,
             [$this, 'onAuthenticationError'],
             $priority
@@ -67,6 +72,11 @@ trait AuthenticationEventListenerTrait
     }
 
     public function onAfterAuthentication(AuthenticationEvent $e)
+    {
+        // no-op
+    }
+
+    public function onAuthenticationSuccess(AuthenticationEvent $e)
     {
         // no-op
     }

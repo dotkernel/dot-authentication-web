@@ -21,6 +21,7 @@ class AuthenticationEvent extends Event
 {
     const EVENT_BEFORE_AUTHENTICATION = 'event.beforeAuthentication';
     const EVENT_AFTER_AUTHENTICATION = 'event.afterAuthentication';
+    const EVENT_AUTHENTICATION_SUCCESS = 'event.authenticationSuccess';
     const EVENT_AUTHENTICATION_ERROR = 'event.authenticationError';
     const EVENT_AUTHENTICATION_BEFORE_RENDER = 'event.authenticationBeforeRender';
 

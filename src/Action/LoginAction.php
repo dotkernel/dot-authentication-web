@@ -54,6 +54,9 @@ class LoginAction implements AuthenticationEventListenerInterface
     /** @var  TemplateRendererInterface */
     protected $template;
 
+    /** @var  ServerRequestInterface */
+    protected $request;
+
     /** @var bool */
     protected $debug = false;
 
@@ -93,6 +96,9 @@ class LoginAction implements AuthenticationEventListenerInterface
         if ($this->authentication->hasIdentity()) {
             return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLoginRoute()));
         }
+
+        $this->request = $request;
+
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
 
@@ -125,18 +131,29 @@ class LoginAction implements AuthenticationEventListenerInterface
                     $params += [
                         'identity' => $result->getIdentity()
                     ];
-                    $this->dispatchEvent(AuthenticationEvent::EVENT_AFTER_AUTHENTICATION, $params);
-
-                    $uri = $this->routeHelper->getUri($this->options->getAfterLoginRoute());
-                    if ($this->options->isEnableWantedUrl()) {
-                        $params = $request->getQueryParams();
-                        $wantedUrlName = $this->options->getWantedUrlName();
-
-                        if (isset($params[$wantedUrlName]) && !empty($params[$wantedUrlName])) {
-                            $uri = new Uri(urldecode($params[$wantedUrlName]));
-                        }
+                    $event = $this->dispatchEvent(AuthenticationEvent::EVENT_AFTER_AUTHENTICATION, $params);
+                    if ($event instanceof ResponseInterface) {
+                        return $event;
                     }
-                    return new RedirectResponse($uri);
+
+                    $error = $event->getParam('error');
+                    if (empty($error)) {
+                        $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_SUCCESS, $params);
+
+                        $uri = $this->routeHelper->getUri($this->options->getAfterLoginRoute());
+                        if ($this->options->isEnableWantedUrl()) {
+                            $params = $request->getQueryParams();
+                            $wantedUrlName = $this->options->getWantedUrlName();
+
+                            if (isset($params[$wantedUrlName]) && !empty($params[$wantedUrlName])) {
+                                $uri = new Uri(urldecode($params[$wantedUrlName]));
+                            }
+                        }
+                        return new RedirectResponse($uri);
+                    } else {
+                        $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_ERROR, $event->getParams());
+                        return $this->prgRedirect($error);
+                    }
                 } else {
                     $message = $this->options->getMessagesOptions()
                         ->getMessage(Utils::$authResultCodeToMessageMap[$result->getCode()]);
@@ -144,23 +161,11 @@ class LoginAction implements AuthenticationEventListenerInterface
                         'error' => $message
                     ];
                     $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_ERROR, $params);
-                    $this->flashMessenger->addError($message);
-                    return new RedirectResponse($request->getUri(), 303);
+                    return $this->prgRedirect($message);
                 }
             } else {
                 $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_ERROR, $event->getParams());
-
-                if (is_array($error) || is_string($error)) {
-                    $this->flashMessenger->addError($error);
-                } elseif ($error instanceof \Exception && $this->isDebug()) {
-                    $this->flashMessenger->addError($error->getMessage());
-                } else {
-                    $this->flashMessenger->addError(
-                        $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::AUTHENTICATION_FAIL_UNKNOWN)
-                    );
-                }
-                return new RedirectResponse($request->getUri(), 303);
+                return $this->prgRedirect($error);
             }
         }
 
@@ -177,6 +182,25 @@ class LoginAction implements AuthenticationEventListenerInterface
                 $event->getParams()
             )
         );
+    }
+
+    /**
+     * @param $error
+     * @return ResponseInterface
+     */
+    protected function prgRedirect($error): ResponseInterface
+    {
+        if (is_array($error) || is_string($error)) {
+            $this->flashMessenger->addError($error);
+        } elseif ($error instanceof \Exception && $this->isDebug()) {
+            $this->flashMessenger->addError($error->getMessage());
+        } else {
+            $this->flashMessenger->addError(
+                $this->options->getMessagesOptions()
+                    ->getMessage(MessagesOptions::AUTHENTICATION_FAIL_UNKNOWN)
+            );
+        }
+        return new RedirectResponse($this->request->getUri(), 303);
     }
 
     /**

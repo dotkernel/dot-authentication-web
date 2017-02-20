@@ -23,6 +23,8 @@ interface AuthenticationEventListenerInterface extends ListenerAggregateInterfac
 
     public function onAfterAuthentication(AuthenticationEvent $e);
 
+    public function onAuthenticationSuccess(AuthenticationEvent $e);
+
     public function onAuthenticationError(AuthenticationEvent $e);
 
     public function onAuthenticationBeforeRender(AuthenticationEvent $e);

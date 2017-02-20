@@ -93,6 +93,7 @@ class UnauthorizedHandler implements AuthenticationEventListenerInterface
             || in_array($response->getStatusCode(), $this->statusCodes)
         ) {
             $event = $this->dispatchEvent(AuthenticationEvent::EVENT_UNAUTHORIZED, [
+                'request' => $request,
                 'authenticationService' => $this->authenticationService,
                 'error' => $error
             ]);

@@ -71,6 +71,7 @@ class LogoutAction implements AuthenticationEventListenerInterface
             return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLogoutRoute()));
         }
         $event = $this->dispatchEvent(AuthenticationEvent::EVENT_BEFORE_LOGOUT, [
+            'request' => $request,
             'authenticationService' => $this->authentication
         ]);
         if ($event instanceof ResponseInterface) {
@@ -80,6 +81,7 @@ class LogoutAction implements AuthenticationEventListenerInterface
         $this->authentication->clearIdentity();
 
         $this->dispatchEvent(AuthenticationEvent::EVENT_AFTER_LOGOUT, [
+            'request' => $request,
             'authenticationService' => $this->authentication
         ]);
 

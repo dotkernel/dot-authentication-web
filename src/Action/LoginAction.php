@@ -103,6 +103,7 @@ class LoginAction implements AuthenticationEventListenerInterface
             $data = $request->getParsedBody();
 
             $event = $this->dispatchEvent(AuthenticationEvent::EVENT_BEFORE_AUTHENTICATION, [
+                'request' => $request,
                 'authenticationService' => $this->authentication,
                 'data' => $data
             ]);
@@ -170,6 +171,7 @@ class LoginAction implements AuthenticationEventListenerInterface
         }
 
         $event = $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_BEFORE_RENDER, [
+            'request' => $request,
             'authenticationService' => $this->authentication
         ]);
         if ($event instanceof ResponseInterface) {

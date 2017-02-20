@@ -12,10 +12,10 @@ declare(strict_types = 1);
 namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\AuthenticationInterface;
-use Dot\Authentication\Web\AuthenticationEventListenerAwareFactoryTrait;
 use Dot\Authentication\Web\ErrorHandler\UnauthorizedHandler;
-use Dot\Authentication\Web\Event\AuthenticationEvent;
-use Dot\Authentication\Web\Listener\DefaultUnauthorizedListener;
+use Dot\Authentication\Web\Options\WebAuthenticationOptions;
+use Dot\FlashMessenger\FlashMessengerInterface;
+use Dot\Helpers\Route\RouteOptionHelper;
 use Interop\Container\ContainerInterface;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
@@ -24,33 +24,31 @@ use Zend\EventManager\EventManagerInterface;
  * Class UnauthorizedHandlerFactory
  * @package Dot\Authentication\Web\Factory
  */
-class UnauthorizedHandlerFactory
+class UnauthorizedHandlerFactory extends BaseActionFactory
 {
-    use AuthenticationEventListenerAwareFactoryTrait;
-
     /**
      * @param ContainerInterface $container
      * @param $requestedName
      * @return UnauthorizedHandler
      */
-    public function __invoke(ContainerInterface $container, string $requestedName)
+    public function __invoke(ContainerInterface $container, string $requestedName): UnauthorizedHandler
     {
         /** @var UnauthorizedHandler $handler */
-        $handler = new $requestedName($container->get(AuthenticationInterface::class));
+        $handler = new $requestedName(
+            $container->get(AuthenticationInterface::class),
+            $container->get(RouteOptionHelper::class),
+            $container->get(WebAuthenticationOptions::class),
+            $container->get(FlashMessengerInterface::class)
+        );
 
         $eventManager = $container->has(EventManagerInterface::class)
             ? $container->get(EventManagerInterface::class)
             : new EventManager();
+
         $handler->setEventManager($eventManager);
 
-        $defaultListener = $container->get(DefaultUnauthorizedListener::class);
-        $eventManager->attach(AuthenticationEvent::EVENT_UNAUTHORIZED, $defaultListener, 1);
-
-        $this->attachAuthenticationListeners(
-            $container,
-            $handler,
-            AuthenticationEvent::EVENT_UNAUTHORIZED
-        );
+        $this->attachListeners($container, $eventManager);
+        $handler->attach($eventManager, 1000);
 
         return $handler;
     }

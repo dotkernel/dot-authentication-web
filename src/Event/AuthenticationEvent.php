@@ -11,9 +11,6 @@ declare(strict_types = 1);
 
 namespace Dot\Authentication\Web\Event;
 
-use Dot\Authentication\AuthenticationInterface;
-use Dot\Authentication\AuthenticationResult;
-use Dot\Authentication\Identity\IdentityInterface;
 use Dot\Event\Event;
 
 /**
@@ -22,83 +19,13 @@ use Dot\Event\Event;
  */
 class AuthenticationEvent extends Event
 {
-    const EVENT_AUTHENTICATE = 'event.authentication.authenticate';
-    const EVENT_LOGOUT = 'event.authentication.logout';
-    const EVENT_UNAUTHORIZED = 'event.authentication.unauthorized';
+    const EVENT_BEFORE_AUTHENTICATION = 'event.beforeAuthentication';
+    const EVENT_AFTER_AUTHENTICATION = 'event.afterAuthentication';
+    const EVENT_AUTHENTICATION_ERROR = 'event.authenticationError';
+    const EVENT_AUTHENTICATION_BEFORE_RENDER = 'event.authenticationBeforeRender';
 
-    /** @var  IdentityInterface */
-    protected $identity;
+    const EVENT_BEFORE_LOGOUT = 'event.beforeLogout';
+    const EVENT_AFTER_LOGOUT = 'event.afterLogout';
 
-    /** @var  AuthenticationResult */
-    protected $result;
-
-    /** @var  AuthenticationInterface */
-    protected $authentication;
-
-    /** @var  mixed */
-    protected $error;
-
-    /**
-     * @return IdentityInterface
-     */
-    public function getIdentity(): ?IdentityInterface
-    {
-        return $this->identity;
-    }
-
-    /**
-     * @param IdentityInterface $identity
-     */
-    public function setIdentity(IdentityInterface $identity)
-    {
-        $this->identity = $identity;
-    }
-
-    /**
-     * @return AuthenticationResult
-     */
-    public function getAuthenticationResult(): ?AuthenticationResult
-    {
-        return $this->result;
-    }
-
-    /**
-     * @param AuthenticationResult $result
-     */
-    public function setAuthenticationResult(AuthenticationResult $result)
-    {
-        $this->result = $result;
-    }
-
-    /**
-     * @return AuthenticationInterface
-     */
-    public function getAuthenticationService(): AuthenticationInterface
-    {
-        return $this->authentication;
-    }
-
-    /**
-     * @param AuthenticationInterface $authentication
-     */
-    public function setAuthenticationService(AuthenticationInterface $authentication)
-    {
-        $this->authentication = $authentication;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getError(): ?mixed
-    {
-        return $this->error;
-    }
-
-    /**
-     * @param mixed|null $error
-     */
-    public function setError(mixed $error = null)
-    {
-        $this->error = $error;
-    }
+    const EVENT_UNAUTHORIZED = 'event.unauthorized';
 }

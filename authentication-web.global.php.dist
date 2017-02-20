@@ -26,26 +26,10 @@ return [
             'wanted_url_name' => 'redirect',
 
             'event_listeners' => [
-                AuthenticationEvent::EVENT_AUTHENTICATE => [
-                    [
-                        'type' => 'Some\Class\Or\Service',
-                        'priority' => 1
-                    ]
+                [
+                    'type' => 'Some\Class\Or\Service',
+                    'priority' => 1
                 ],
-
-                AuthenticationEvent::EVENT_LOGOUT => [
-                     [
-                        'type' => 'Some\Class\Or\Service',
-                        'priority' => 1
-                     ]
-                ],
-
-                AuthenticationEvent::EVENT_UNAUTHORIZED => [
-                     [
-                        'type' => 'Some\Class\Or\Service',
-                        'priority' => 1
-                     ]
-                ]
             ],
 
             //for overwriting default module messages

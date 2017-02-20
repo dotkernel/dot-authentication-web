@@ -14,16 +14,10 @@ namespace Dot\Authentication\Web;
 use Dot\Authentication\Web\Action\LoginAction;
 use Dot\Authentication\Web\Action\LogoutAction;
 use Dot\Authentication\Web\ErrorHandler\UnauthorizedHandler;
-use Dot\Authentication\Web\Factory\DefaultAuthenticationListenerFactory;
-use Dot\Authentication\Web\Factory\DefaultLogoutListenerFactory;
-use Dot\Authentication\Web\Factory\DefaultUnauthorizedListenerFactory;
 use Dot\Authentication\Web\Factory\LoginActionFactory;
 use Dot\Authentication\Web\Factory\LogoutActionFactory;
 use Dot\Authentication\Web\Factory\UnauthorizedHandlerFactory;
 use Dot\Authentication\Web\Factory\WebAuthenticationOptionsFactory;
-use Dot\Authentication\Web\Listener\DefaultAuthenticationListener;
-use Dot\Authentication\Web\Listener\DefaultLogoutListener;
-use Dot\Authentication\Web\Listener\DefaultUnauthorizedListener;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 
 class ConfigProvider
@@ -79,15 +73,9 @@ class ConfigProvider
         return [
             'factories' => [
                 WebAuthenticationOptions::class => WebAuthenticationOptionsFactory::class,
-
                 LoginAction::class => LoginActionFactory::class,
                 LogoutAction::class => LogoutActionFactory::class,
-
                 UnauthorizedHandler::class => UnauthorizedHandlerFactory::class,
-
-                DefaultAuthenticationListener::class => DefaultAuthenticationListenerFactory::class,
-                DefaultLogoutListener::class => DefaultLogoutListenerFactory::class,
-                DefaultUnauthorizedListener::class => DefaultUnauthorizedListenerFactory::class,
             ]
         ];
     }

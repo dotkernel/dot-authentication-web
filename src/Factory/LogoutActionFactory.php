@@ -13,9 +13,6 @@ namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\Action\LogoutAction;
-use Dot\Authentication\Web\AuthenticationEventListenerAwareFactoryTrait;
-use Dot\Authentication\Web\Event\AuthenticationEvent;
-use Dot\Authentication\Web\Listener\DefaultLogoutListener;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Helpers\Route\RouteOptionHelper;
 use Interop\Container\ContainerInterface;
@@ -26,16 +23,14 @@ use Zend\EventManager\EventManagerInterface;
  * Class LogoutActionFactory
  * @package Dot\Authentication\Web\Factory
  */
-class LogoutActionFactory
+class LogoutActionFactory extends BaseActionFactory
 {
-    use AuthenticationEventListenerAwareFactoryTrait;
-
     /**
      * @param ContainerInterface $container
      * @param $requestedName
      * @return LogoutAction
      */
-    public function __invoke(ContainerInterface $container, string $requestedName)
+    public function __invoke(ContainerInterface $container, string $requestedName): LogoutAction
     {
         /** @var LogoutAction $action */
         $action = new $requestedName(
@@ -50,14 +45,8 @@ class LogoutActionFactory
 
         $action->setEventManager($eventManager);
 
-        $defaultListeners = $container->get(DefaultLogoutListener::class);
-        $defaultListeners->attach($eventManager);
-
-        $this->attachAuthenticationListeners(
-            $container,
-            $action,
-            AuthenticationEvent::EVENT_LOGOUT
-        );
+        $this->attachListeners($container, $eventManager);
+        $action->attach($eventManager, 1000);
 
         return $action;
     }

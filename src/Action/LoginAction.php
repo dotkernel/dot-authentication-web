@@ -12,24 +12,32 @@ declare(strict_types = 1);
 namespace Dot\Authentication\Web\Action;
 
 use Dot\Authentication\AuthenticationInterface;
-use Dot\Authentication\Web\AuthenticationEventTrait;
+use Dot\Authentication\AuthenticationResult;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
-use Dot\Authentication\Web\Event\AuthenticationEventListenerAwareInterface;
-use Dot\Authentication\Web\Event\AuthenticationEventListenerAwareTrait;
+use Dot\Authentication\Web\Event\AuthenticationEventListenerInterface;
+use Dot\Authentication\Web\Event\AuthenticationEventListenerTrait;
+use Dot\Authentication\Web\Event\DispatchAuthenticationEventTrait;
+use Dot\Authentication\Web\Exception\RuntimeException;
+use Dot\Authentication\Web\Options\MessagesOptions;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
+use Dot\Authentication\Web\Utils;
+use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\RedirectResponse;
+use Zend\Diactoros\Uri;
+use Zend\Expressive\Template\TemplateRendererInterface;
 
 /**
  * Class LoginAction
  * @package Dot\Authentication\Web\Action
  */
-class LoginAction implements AuthenticationEventListenerAwareInterface
+class LoginAction implements AuthenticationEventListenerInterface
 {
-    use AuthenticationEventListenerAwareTrait;
-    use AuthenticationEventTrait;
+    use DispatchAuthenticationEventTrait;
+    use AuthenticationEventListenerTrait;
 
     /** @var  AuthenticationInterface */
     protected $authentication;
@@ -40,20 +48,35 @@ class LoginAction implements AuthenticationEventListenerAwareInterface
     /** @var  WebAuthenticationOptions */
     protected $options;
 
+    /** @var  FlashMessengerInterface */
+    protected $flashMessenger;
+
+    /** @var  TemplateRendererInterface */
+    protected $template;
+
+    /** @var bool */
+    protected $debug = false;
+
     /**
      * LoginAction constructor.
      * @param AuthenticationInterface $authentication
+     * @param TemplateRendererInterface $template
      * @param RouteOptionHelper $routeHelper
      * @param WebAuthenticationOptions $options
+     * @param FlashMessengerInterface $flashMessenger
      */
     public function __construct(
         AuthenticationInterface $authentication,
+        TemplateRendererInterface $template,
         RouteOptionHelper $routeHelper,
-        WebAuthenticationOptions $options
+        WebAuthenticationOptions $options,
+        FlashMessengerInterface $flashMessenger
     ) {
         $this->authentication = $authentication;
         $this->options = $options;
         $this->routeHelper = $routeHelper;
+        $this->flashMessenger = $flashMessenger;
+        $this->template = $template;
     }
 
     /**
@@ -70,34 +93,105 @@ class LoginAction implements AuthenticationEventListenerAwareInterface
         if ($this->authentication->hasIdentity()) {
             return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLoginRoute()));
         }
-
-        $data = [];
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
+
+            $event = $this->dispatchEvent(AuthenticationEvent::EVENT_BEFORE_AUTHENTICATION, [
+                'authenticationService' => $this->authentication,
+                'data' => $data
+            ]);
+
+            if ($event instanceof ResponseInterface) {
+                return $event;
+            }
+
+            $error = $event->getParam('error', null);
+            if (empty($error)) {
+                $result = $this->authentication->authenticate($request);
+                //we get this in case authentication skipped(due to missing credentials in request)
+                //but for web application, we want to force implemetors to prepare their auth adapter first
+                //so we throw an exception to be clear developers have missed something
+                if ($result->getCode() === AuthenticationResult::FAILURE_MISSING_CREDENTIALS) {
+                    throw new RuntimeException('Authentication service could not authenticate request. ' .
+                        'Have you forgot to prepare the request first according to authentication adapter needs?');
+                }
+
+                $params = $event->getParams();
+                $params += [
+                    'authenticationResult' => $result
+                ];
+
+                if ($result->isValid()) {
+                    $params += [
+                        'identity' => $result->getIdentity()
+                    ];
+                    $this->dispatchEvent(AuthenticationEvent::EVENT_AFTER_AUTHENTICATION, $params);
+
+                    $uri = $this->routeHelper->getUri($this->options->getAfterLoginRoute());
+                    if ($this->options->isEnableWantedUrl()) {
+                        $params = $request->getQueryParams();
+                        $wantedUrlName = $this->options->getWantedUrlName();
+
+                        if (isset($params[$wantedUrlName]) && !empty($params[$wantedUrlName])) {
+                            $uri = new Uri(urldecode($params[$wantedUrlName]));
+                        }
+                    }
+                    return new RedirectResponse($uri);
+                } else {
+                    $message = $this->options->getMessagesOptions()
+                        ->getMessage(Utils::$authResultCodeToMessageMap[$result->getCode()]);
+                    $params += [
+                        'error' => $message
+                    ];
+                    $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_ERROR, $params);
+                    $this->flashMessenger->addError($message);
+                    return new RedirectResponse($request->getUri(), 303);
+                }
+            } else {
+                $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_ERROR, $event->getParams());
+
+                if (is_array($error) || is_string($error)) {
+                    $this->flashMessenger->addError($error);
+                } elseif ($error instanceof \Exception && $this->isDebug()) {
+                    $this->flashMessenger->addError($error->getMessage());
+                } else {
+                    $this->flashMessenger->addError(
+                        $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::AUTHENTICATION_FAIL_UNKNOWN)
+                    );
+                }
+                return new RedirectResponse($request->getUri(), 303);
+            }
         }
 
-        $result = $this->triggerAuthenticateEvent($request, $data);
-        if ($result instanceof ResponseInterface) {
-            return $result;
+        $event = $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_BEFORE_RENDER, [
+            'authenticationService' => $this->authentication
+        ]);
+        if ($event instanceof ResponseInterface) {
+            return $event;
         }
 
-        return $next($request, $response);
+        return new HtmlResponse(
+            $this->template->render(
+                $this->options->getLoginTemplate(),
+                $event->getParams()
+            )
+        );
     }
 
-    public function triggerAuthenticateEvent(ServerRequestInterface $request, array $data): ?ResponseInterface
+    /**
+     * @return bool
+     */
+    public function isDebug(): bool
     {
-        $event = $this->createAuthenticationEvent(
-            $this->authentication,
-            AuthenticationEvent::EVENT_AUTHENTICATE,
-            $data,
-            $request
-        );
+        return $this->debug;
+    }
 
-        $result = $this->getEventManager()->triggerEventUntil(function ($r) {
-            return ($r instanceof ResponseInterface);
-        }, $event);
-
-        $result = $result->last();
-        return $result;
+    /**
+     * @param bool $debug
+     */
+    public function setDebug(bool $debug)
+    {
+        $this->debug = $debug;
     }
 }

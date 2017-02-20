@@ -11,7 +11,6 @@ declare(strict_types = 1);
 
 namespace Dot\Authentication\Web\Event;
 
-use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 
 /**
@@ -20,25 +19,17 @@ use Zend\EventManager\ListenerAggregateInterface;
  */
 interface AuthenticationEventListenerInterface extends ListenerAggregateInterface
 {
-    /**
-     * @param EventManagerInterface $events
-     * @param int $priority
-     * @param string $eventName
-     */
-    public function attach(EventManagerInterface $events, $priority = 1, string $eventName = '');
+    public function onBeforeAuthentication(AuthenticationEvent $e);
 
-    /**
-     * @param AuthenticationEvent $e
-     */
-    public function onAuthenticate(AuthenticationEvent $e);
+    public function onAfterAuthentication(AuthenticationEvent $e);
 
-    /**
-     * @param AuthenticationEvent $e
-     */
-    public function onLogout(AuthenticationEvent $e);
+    public function onAuthenticationError(AuthenticationEvent $e);
 
-    /**
-     * @param AuthenticationEvent $e
-     */
+    public function onAuthenticationBeforeRender(AuthenticationEvent $e);
+
+    public function onBeforeLogout(AuthenticationEvent $e);
+
+    public function onAfterLogout(AuthenticationEvent $e);
+
     public function onUnauthorized(AuthenticationEvent $e);
 }

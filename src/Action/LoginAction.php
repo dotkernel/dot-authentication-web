@@ -172,18 +172,18 @@ class LoginAction implements AuthenticationEventListenerInterface
 
         $event = $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_BEFORE_RENDER, [
             'request' => $request,
-            'authenticationService' => $this->authentication
+            'authenticationService' => $this->authentication,
+            'template' => $this->options->getLoginTemplate()
         ]);
         if ($event instanceof ResponseInterface) {
             return $event;
         }
 
-        return new HtmlResponse(
-            $this->template->render(
-                $this->options->getLoginTemplate(),
-                $event->getParams()
-            )
-        );
+        $template = $event->getParam('template');
+        $params = $event->getParams();
+        unset($params['template']);
+
+        return new HtmlResponse($this->template->render($template, $params));
     }
 
     /**

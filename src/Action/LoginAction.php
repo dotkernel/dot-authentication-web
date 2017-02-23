@@ -113,6 +113,9 @@ class LoginAction implements AuthenticationEventListenerInterface
             }
 
             $error = $event->getParam('error', null);
+            // get the request in case someone changed it
+            $request = $event->getParam('request');
+            $this->request = $request;
             if (empty($error)) {
                 $result = $this->authentication->authenticate($request);
                 //we get this in case authentication skipped(due to missing credentials in request)

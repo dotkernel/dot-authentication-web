@@ -17,8 +17,6 @@ use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
 use Interop\Container\ContainerInterface;
-use Zend\EventManager\EventManager;
-use Zend\EventManager\EventManagerInterface;
 use Zend\Expressive\Template\TemplateRendererInterface;
 
 /**
@@ -37,10 +35,6 @@ class LoginActionFactory extends BaseActionFactory
         $config = $container->get('config');
         $debug = $config['debug'] ?? false;
 
-        $eventManager = $container->has(EventManagerInterface::class)
-            ? $container->get(EventManagerInterface::class)
-            : new EventManager();
-
         /** @var LoginAction $action */
         $action = new $requestedName(
             $container->get(AuthenticationInterface::class),
@@ -50,11 +44,10 @@ class LoginActionFactory extends BaseActionFactory
             $container->get(FlashMessengerInterface::class)
         );
 
-        $action->setEventManager($eventManager);
         $action->setDebug($debug);
 
-        $this->attachListeners($container, $eventManager);
-        $action->attach($eventManager, 1000);
+        $this->attachListeners($container, $action->getEventManager());
+        $action->attach($action->getEventManager(), 1000);
 
         return $action;
     }

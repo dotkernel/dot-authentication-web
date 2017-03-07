@@ -16,8 +16,6 @@ use Dot\Authentication\Web\Action\LogoutAction;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Helpers\Route\RouteOptionHelper;
 use Interop\Container\ContainerInterface;
-use Zend\EventManager\EventManager;
-use Zend\EventManager\EventManagerInterface;
 
 /**
  * Class LogoutActionFactory
@@ -39,14 +37,8 @@ class LogoutActionFactory extends BaseActionFactory
             $container->get(WebAuthenticationOptions::class)
         );
 
-        $eventManager = $container->has(EventManagerInterface::class)
-            ? $container->get(EventManagerInterface::class)
-            : new EventManager();
-
-        $action->setEventManager($eventManager);
-
-        $this->attachListeners($container, $eventManager);
-        $action->attach($eventManager, 1000);
+        $this->attachListeners($container, $action->getEventManager());
+        $action->attach($action->getEventManager(), 1000);
 
         return $action;
     }

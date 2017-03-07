@@ -17,8 +17,6 @@ use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
 use Interop\Container\ContainerInterface;
-use Zend\EventManager\EventManager;
-use Zend\EventManager\EventManagerInterface;
 
 /**
  * Class UnauthorizedHandlerFactory
@@ -41,14 +39,8 @@ class UnauthorizedHandlerFactory extends BaseActionFactory
             $container->get(FlashMessengerInterface::class)
         );
 
-        $eventManager = $container->has(EventManagerInterface::class)
-            ? $container->get(EventManagerInterface::class)
-            : new EventManager();
-
-        $handler->setEventManager($eventManager);
-
-        $this->attachListeners($container, $eventManager);
-        $handler->attach($eventManager, 1000);
+        $this->attachListeners($container, $handler->getEventManager());
+        $handler->attach($handler->getEventManager(), 1000);
 
         return $handler;
     }

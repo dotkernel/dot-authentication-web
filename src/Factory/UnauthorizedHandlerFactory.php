@@ -7,37 +7,40 @@
  * Time: 3:15 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\ErrorHandler\UnauthorizedHandler;
-use Dot\Authentication\Web\Event\AuthenticationEvent;
-use Dot\Authentication\Web\Listener\DefaultUnauthorizedListener;
+use Dot\Authentication\Web\Options\WebAuthenticationOptions;
+use Dot\FlashMessenger\FlashMessengerInterface;
+use Dot\Helpers\Route\RouteOptionHelper;
 use Interop\Container\ContainerInterface;
-use Zend\EventManager\EventManager;
-use Zend\EventManager\EventManagerInterface;
 
 /**
  * Class UnauthorizedHandlerFactory
  * @package Dot\Authentication\Web\Factory
  */
-class UnauthorizedHandlerFactory
+class UnauthorizedHandlerFactory extends BaseActionFactory
 {
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return UnauthorizedHandler
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName): UnauthorizedHandler
     {
-        $eventManager = $container->has(EventManagerInterface::class)
-            ? $container->get(EventManagerInterface::class)
-            : new EventManager();
+        /** @var UnauthorizedHandler $handler */
+        $handler = new $requestedName(
+            $container->get(AuthenticationInterface::class),
+            $container->get(RouteOptionHelper::class),
+            $container->get(WebAuthenticationOptions::class),
+            $container->get(FlashMessengerInterface::class)
+        );
 
-        $defaultListener = $container->get(DefaultUnauthorizedListener::class);
-        $eventManager->attach(AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED, $defaultListener, 1);
-
-        $handler = new UnauthorizedHandler($container->get(AuthenticationInterface::class));
-        $handler->setEventManager($eventManager);
+        $this->attachListeners($container, $handler->getEventManager());
+        $handler->attach($handler->getEventManager(), 1000);
 
         return $handler;
     }

@@ -10,24 +10,57 @@ return [
         //this package's specific configuration template
         'web' => [
             //change next two only if you changed the default login/logout routes
-            'login_route' => ['name' => 'login', 'params' => [], 'query_params' => []],
-            'logout_route' => ['name' => 'logout', 'params' => []],
+            'login_route' => ['route_name' => 'login', 'route_params' => [], 'query_params' => []],
+            'logout_route' => ['route_name' => 'logout', 'route_params' => []],
 
             //template name to use for the login form
             'login_template' => 'app::login',
 
             //where to redirect after login success
-            'after_login_route' => ['name' => 'my-account', 'params' => []],
+            'after_login_route' => ['route_name' => 'my-account', 'route_params' => []],
             //where to redirect after logging out
-            'after_logout_route' => ['name' => 'login', 'params' => []],
+            'after_logout_route' => ['route_name' => 'login', 'route_params' => []],
 
             //enable the wanted url feature, to login to the previously requested uri after login
-            'allow_redirect_param' => true,
-            'redirect_param_name' => 'redirect',
+            'enable_wanted_url' => true,
+            'wanted_url_name' => 'redirect',
+
+            'event_listeners' => [
+                [
+                    'type' => 'Some\Class\Or\Service',
+                    'priority' => 1
+                ],
+            ],
 
             //for overwriting default module messages
             'messages_options' => [
-                'messages' => [],
+                'messages' => [
+                    //MessagesOptions::AUTHENTICATION_FAILURE =>
+                    //    'Authentication failed. Check your credentials and try again',
+
+                    //MessagesOptions::AUTHENTICATION_INVALID_CREDENTIALS =>
+                    //    'Authentication failed. Check your credentials and try again',
+
+                    //MessagesOptions::AUTHENTICATION_IDENTITY_AMBIGUOUS =>
+                    //    'Authentication failed. Check your credentials and try again',
+
+                    //MessagesOptions::AUTHENTICATION_IDENTITY_NOT_FOUND =>
+                    //   'Authentication failed. Check your credentials and try again',
+
+                    //MessagesOptions::AUTHENTICATION_UNCATEGORIZED =>
+                    //    'Authentication failed. Check your credentials and try again',
+
+                    //MessagesOptions::AUTHENTICATION_MISSING_CREDENTIALS =>
+                    //    'Authentication failed. Missing or invalid credentials',
+
+                    //MessagesOptions::AUTHENTICATION_SUCCESS =>
+                    //    'Welcome! You have successfully signed in',
+
+                    //MessagesOptions::AUTHENTICATION_FAIL_UNKNOWN =>
+                    //    'Authentication failed. Check your credentials and try again',
+
+                    //MessagesOptions::UNAUTHORIZED => 'You must sign in first to access the requested content',
+                ],
             ],
         ]
     ]

@@ -7,6 +7,8 @@
  * Time: 8:37 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Options;
 
 use Zend\Stdlib\AbstractOptions;
@@ -18,43 +20,77 @@ use Zend\Stdlib\ArrayUtils;
  */
 class MessagesOptions extends AbstractOptions
 {
-    const AUTHENTICATION_FAIL_MESSAGE = 0;
-    const UNAUTHORIZED_MESSAGE = 1;
+    const AUTHENTICATION_FAILURE = 0;
+    const AUTHENTICATION_INVALID_CREDENTIALS = 1;
+    const AUTHENTICATION_IDENTITY_AMBIGUOUS = 2;
+    const AUTHENTICATION_IDENTITY_NOT_FOUND = 3;
+    const AUTHENTICATION_UNCATEGORIZED = 4;
+    const AUTHENTICATION_MISSING_CREDENTIALS = 5;
+    const AUTHENTICATION_SUCCESS = 6;
+    const AUTHENTICATION_FAIL_UNKNOWN = 7;
+
+    const UNAUTHORIZED = 8;
 
     protected $messages = [
-        MessagesOptions::AUTHENTICATION_FAIL_MESSAGE =>
+        MessagesOptions::AUTHENTICATION_FAILURE =>
             'Authentication failed. Check your credentials and try again',
 
-        MessagesOptions::UNAUTHORIZED_MESSAGE =>
-            'You must be authenticated to access the requested content',
+        MessagesOptions::AUTHENTICATION_INVALID_CREDENTIALS =>
+            'Authentication failed. Check your credentials and try again',
+
+        MessagesOptions::AUTHENTICATION_IDENTITY_AMBIGUOUS =>
+            'Authentication failed. Check your credentials and try again',
+
+        MessagesOptions::AUTHENTICATION_IDENTITY_NOT_FOUND =>
+            'Authentication failed. Check your credentials and try again',
+
+        MessagesOptions::AUTHENTICATION_UNCATEGORIZED =>
+            'Authentication failed. Check your credentials and try again',
+
+        MessagesOptions::AUTHENTICATION_MISSING_CREDENTIALS =>
+            'Authentication failed. Missing or invalid credentials',
+
+        MessagesOptions::AUTHENTICATION_SUCCESS =>
+            'Welcome! You have successfully signed in',
+
+        MessagesOptions::AUTHENTICATION_FAIL_UNKNOWN =>
+            'Authentication failed. Check your credentials and try again',
+
+        MessagesOptions::UNAUTHORIZED => 'You must sign in first to access the requested content',
     ];
 
-    protected $__strictMode__ = false;
+    /**
+     * MessagesOptions constructor.
+     * @param null $options
+     */
+    public function __construct($options = null)
+    {
+        $this->__strictMode__ = false;
+        parent::__construct($options);
+    }
 
     /**
      * @return array
      */
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->messages;
     }
 
     /**
      * @param $messages
-     * @return $this
      */
-    public function setMessages($messages)
+    public function setMessages(array $messages)
     {
         $this->messages = ArrayUtils::merge($this->messages, $messages, true);
-        return $this;
     }
 
     /**
      * @param $key
      * @return mixed|string
      */
-    public function getMessage($key)
+    public function getMessage(int $key): string
     {
-        return isset($this->messages[$key]) ? $this->messages[$key] : null;
+        return $this->messages[$key] ?? '';
     }
 }

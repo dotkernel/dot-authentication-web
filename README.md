@@ -26,24 +26,57 @@ return [
         //this package's specific configuration template
         'web' => [
             //change next two only if you changed the default login/logout routes
-            'login_route' => ['name' => 'login', 'params' => [], 'query_params' => []],
-            'logout_route' => ['name' => 'logout', 'params' => []],
-
+            'login_route' => ['route_name' => 'login', 'route_params' => [], 'query_params' => []],
+            'logout_route' => ['route_name' => 'logout', 'route_params' => []],
+            
             //template name to use for the login form
             'login_template' => 'app::login',
-
+            
             //where to redirect after login success
-            'after_login_route' => ['name' => 'my-account', 'params' => []],
+            'after_login_route' => ['route_name' => 'my-account', 'route_params' => []],
             //where to redirect after logging out
-            'after_logout_route' => ['name' => 'login', 'params' => []],
-
+            'after_logout_route' => ['route_name' => 'login', 'route_params' => []],
+            
             //enable the wanted url feature, to login to the previously requested uri after login
-            'allow_redirect_param' => true,
-            'redirect_param_name' => 'redirect',
-
+            'enable_wanted_url' => true,
+            'wanted_url_name' => 'redirect',
+            
+            'event_listeners' => [
+                [
+                    'type' => 'Some\Class\Or\Service',
+                    'priority' => 1
+                ],
+            ],
+            
             //for overwriting default module messages
             'messages_options' => [
-                'messages' => [],
+                'messages' => [
+                    //MessagesOptions::AUTHENTICATION_FAILURE =>
+                    //    'Authentication failed. Check your credentials and try again',
+                    
+                    //MessagesOptions::AUTHENTICATION_INVALID_CREDENTIALS =>
+                    //    'Authentication failed. Check your credentials and try again',
+                    
+                    //MessagesOptions::AUTHENTICATION_IDENTITY_AMBIGUOUS =>
+                    //    'Authentication failed. Check your credentials and try again',
+                    
+                    //MessagesOptions::AUTHENTICATION_IDENTITY_NOT_FOUND =>
+                    //   'Authentication failed. Check your credentials and try again',
+                    
+                    //MessagesOptions::AUTHENTICATION_UNCATEGORIZED =>
+                    //    'Authentication failed. Check your credentials and try again',
+                    
+                    //MessagesOptions::AUTHENTICATION_MISSING_CREDENTIALS =>
+                    //    'Authentication failed. Missing or invalid credentials',
+                    
+                    //MessagesOptions::AUTHENTICATION_SUCCESS =>
+                    //    'Welcome! You have successfully signed in',
+                    
+                    //MessagesOptions::AUTHENTICATION_FAIL_UNKNOWN =>
+                    //    'Authentication failed. Check your credentials and try again',
+                    
+                    //MessagesOptions::UNAUTHORIZED => 'You must sign in first to access the requested content',
+                ],
             ],
         ]
     ]
@@ -52,44 +85,4 @@ return [
 
 ## Login flow
 
-The authentication flow uses [zend-eventmanager](https://github.com/zendframework/zend-eventmanager). We advise you to check the official documentation before.
-
-Calling the login route and subsequently the LoginAction middleware, an authentication event is triggered.
-The actual authentication process happens on a listener registered at priority 1 defined in the listener aggregate `DefaultAuthenticationListener`
-Please note the authentication event is triggered on both GET and POST requests. You should check in your listeners the request method before taking the appropriate action.
-
-There is also a post authentication listener at priority -1000 that checks if there are errors and redirects back to the login page.
-If authentication succeeded, it redirects to the after login route or the wanted url.
-
-You can come with your own listeners to further extend the functionality or even completely rewrite the authentication process.
-
-
-## Logout flow
-
-Calling LogoutAction middleware, similar to login, it triggers a logout event. We provide a default logout listeners that uses an AuthenticationInterface service to clear the identity from storage.
-It also redirects to the after logout route as configured. Again, you can register your own listeners for this event to do additional actions when users log out.
-
-## Unauthorized exception handling
-
-A piped error handler middleware is provided to catch UnauthorizedException or any Exception or response that has a 401 code.
-In the same vein as login/logout, the unauthorized handler does not process the exception, it delegates instead responsibility to listeners by triggering an unauthorized event.
-
-The default unauthorized listener process the authentication error messages, setting them as session messages(flash messages) and redirects back to the login route, optionally appending the wanted url to the query.
-
-
-## AuthenticationEvent
-
-Triggered on login, logout and unauthorized actions, it holds identity information, authentication result and also the authentication service, and current errors, depending on the authentication stage.
-Defines 3 types of authentication events
-* `AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE` - triggered when authentication is needed
-* `AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT` - triggered when logout is needed
-* `AuthenticationEvent::EVENT_AUTHENTICATION_UNAUTHORIZED` - triggered when an UnauthorizedException or 401 codes are detected
-
-The package provides default listeners for all these events, in order to provide just the basic functionality of a web authentication flow.
-
-
-## Useful observations
-
-* The default authentication listener skips if the AuthenticationEvent errors property is not empty. This allows you to have pre authentication listeners to make additional validations for example.
-* The AuthenticationEvent->getParams() are sent to the login template, so you can inject your own variables into the template(like the login form, for example)
-* If you have listeners that return a ResponseInterface, you basically interrupt the listener chain. You could use this to completely rewrite the authentication flow if needed, by registering listeners before all the default ones that are provided.
+@TODO: write full documentation for new version

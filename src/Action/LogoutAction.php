@@ -7,26 +7,29 @@
  * Time: 8:37 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Action;
 
 use Dot\Authentication\AuthenticationInterface;
-use Dot\Authentication\Web\AuthenticationEventTrait;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
+use Dot\Authentication\Web\Event\AuthenticationEventListenerInterface;
+use Dot\Authentication\Web\Event\AuthenticationEventListenerTrait;
+use Dot\Authentication\Web\Event\DispatchAuthenticationEventTrait;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Helpers\Route\RouteOptionHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\RedirectResponse;
-use Zend\EventManager\EventManagerAwareTrait;
 
 /**
  * Class LogoutAction
  * @package Dot\Authentication\Web\Action
  */
-class LogoutAction
+class LogoutAction implements AuthenticationEventListenerInterface
 {
-    use EventManagerAwareTrait;
-    use AuthenticationEventTrait;
+    use AuthenticationEventListenerTrait;
+    use DispatchAuthenticationEventTrait;
 
     /** @var  AuthenticationInterface */
     protected $authentication;
@@ -59,43 +62,30 @@ class LogoutAction
      * @param callable|null $next
      * @return RedirectResponse|ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
-    {
+    public function __invoke(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ): ResponseInterface {
         if (!$this->authentication->hasIdentity()) {
             return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLogoutRoute()));
         }
-
-        $result = $this->triggerLogoutEvent($request, $response);
-        if ($result instanceof ResponseInterface) {
-            return $result;
+        $event = $this->dispatchEvent(AuthenticationEvent::EVENT_BEFORE_LOGOUT, [
+            'request' => $request,
+            'authenticationService' => $this->authentication
+        ]);
+        if ($event instanceof ResponseInterface) {
+            return $event;
         }
 
-        error_log(
-            sprintf(
-                'Logout event listeners should return a ResponseInterface, "%s" returned',
-                is_object($result) ? get_class($result) : gettype($result)
-            ),
-            E_USER_WARNING
-        );
+        $this->authentication->clearIdentity();
 
-        return $next($request, $response);
-    }
+        $this->dispatchEvent(AuthenticationEvent::EVENT_AFTER_LOGOUT, [
+            'request' => $request,
+            'authenticationService' => $this->authentication
+        ]);
 
-    public function triggerLogoutEvent(ServerRequestInterface $request, ResponseInterface $response)
-    {
-        $event = $this->createAuthenticationEvent(
-            $this->authentication,
-            AuthenticationEvent::EVENT_AUTHENTICATION_LOGOUT,
-            [],
-            $request,
-            $response
-        );
-
-        $result = $this->getEventManager()->triggerEventUntil(function ($r) {
-            return ($r instanceof ResponseInterface);
-        }, $event);
-
-        $result = $result->last();
-        return $result;
+        $uri = $this->routeHelper->getUri($this->options->getAfterLogoutRoute());
+        return new RedirectResponse($uri);
     }
 }

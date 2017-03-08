@@ -7,6 +7,8 @@
  * Time: 3:01 PM
  */
 
+declare(strict_types = 1);
+
 namespace Dot\Authentication\Web\Exception;
 
 /**

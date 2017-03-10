@@ -14,10 +14,10 @@
     "psr/http-message": "^1.0",
     "container-interop/container-interop": "^1.1",
 
-    "dotkernel/dot-authentication": "~0.1",
-    "dotkernel/dot-event": "~0.1",
-    "dotkernel/dot-helpers": "~0.1",
-    "dotkernel/dot-flashmessenger": "~0.1"
+    "dotkernel/dot-authentication": "^0.1",
+    "dotkernel/dot-event": "^0.1",
+    "dotkernel/dot-helpers": "^0.1",
+    "dotkernel/dot-flashmessenger": "^0.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^4.8",

@@ -25,32 +25,6 @@ class ConfigProvider
         return [
             'dependencies' => $this->getDependenciesConfig(),
 
-            'middleware_pipeline' => [
-                'error' => [
-                    'middleware' => [
-                        UnauthorizedHandler::class,
-                    ],
-                    'error' => true,
-                    'priority' => -10000,
-                ],
-            ],
-
-            //default routes
-            'routes' => [
-                'login_route' => [
-                    'name' => 'login',
-                    'path' => '/login',
-                    'middleware' => LoginAction::class,
-                    'allowed_methods' => ['GET', 'POST']
-                ],
-                'logout_route' => [
-                    'name' => 'logout',
-                    'path' => '/logout',
-                    'middleware' => LogoutAction::class,
-                    'allowed_methods' => ['GET']
-                ],
-            ],
-
             'dot_authentication' => [
                 'web' => [
                     'event_listeners' => [],

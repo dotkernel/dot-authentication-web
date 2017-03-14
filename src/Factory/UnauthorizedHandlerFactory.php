@@ -14,7 +14,7 @@ use Dot\Authentication\Web\ErrorHandler\UnauthorizedHandler;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class UnauthorizedHandlerFactory

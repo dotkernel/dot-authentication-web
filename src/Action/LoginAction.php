@@ -21,6 +21,8 @@ use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Authentication\Web\Utils;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\HtmlResponse;
@@ -32,7 +34,7 @@ use Zend\Expressive\Template\TemplateRendererInterface;
  * Class LoginAction
  * @package Dot\Authentication\Web\Action
  */
-class LoginAction implements AuthenticationEventListenerInterface
+class LoginAction implements MiddlewareInterface, AuthenticationEventListenerInterface
 {
     use DispatchAuthenticationEventTrait;
     use AuthenticationEventListenerTrait;
@@ -82,15 +84,11 @@ class LoginAction implements AuthenticationEventListenerInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable|null $next
+     * @param DelegateInterface $delegate
      * @return ResponseInterface
      */
-    public function __invoke(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next = null
-    ): ResponseInterface {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    {
         if ($this->authentication->hasIdentity()) {
             return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLoginRoute()));
         }

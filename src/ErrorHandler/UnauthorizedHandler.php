@@ -21,17 +21,20 @@ use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteOptionHelper;
 use Dot\Helpers\Route\UriHelperTrait;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
+use Zend\Expressive\Helper\UrlHelper;
 
 /**
  * Class UnauthorizedHandler
  * @package Dot\Authentication\Web\ErrorHandler
  */
-class UnauthorizedHandler implements AuthenticationEventListenerInterface
+class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventListenerInterface
 {
     use AuthenticationEventListenerTrait;
     use DispatchAuthenticationEventTrait;
@@ -39,6 +42,9 @@ class UnauthorizedHandler implements AuthenticationEventListenerInterface
 
     /** @var  AuthenticationInterface */
     protected $authenticationService;
+
+    /** @var  UrlHelper */
+    protected $urlHelper;
 
     /** @var  WebAuthenticationOptions */
     protected $options;
@@ -75,61 +81,101 @@ class UnauthorizedHandler implements AuthenticationEventListenerInterface
     }
 
     /**
+     * @param ServerRequestInterface $request
+     * @param DelegateInterface $delegate
+     * @return ResponseInterface
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    {
+        try {
+            $response = $delegate->process($request);
+
+            if (in_array($response->getStatusCode(), $this->statusCodes)) {
+                return $this->handleUnauthorizedError(
+                    $this->options->getMessagesOptions()->getMessage(MessagesOptions::UNAUTHORIZED),
+                    $request,
+                    $response
+                );
+            }
+            return $response;
+        } catch (UnauthorizedException $e) {
+            return $this->handleUnauthorizedError($e, $request);
+        } catch (\Throwable $e) {
+            if (in_array($e->getCode(), $this->statusCodes)) {
+                return $this->handleUnauthorizedError($e, $request);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            if (in_array($e->getCode(), $this->statusCodes)) {
+                return $this->handleUnauthorizedError($e, $request);
+            }
+            throw $e;
+        }
+    }
+
+    /**
      * @param $error
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable|null $next
+     * @param ResponseInterface|null $response
      * @return ResponseInterface
      */
-    public function __invoke(
+    protected function handleUnauthorizedError(
         $error,
         ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next = null
+        ResponseInterface $response = null
     ): ResponseInterface {
-        if ($error instanceof \Exception && in_array($error->getCode(), $this->statusCodes)
-            || in_array($response->getStatusCode(), $this->statusCodes)
-        ) {
-            $event = $this->dispatchEvent(AuthenticationEvent::EVENT_UNAUTHORIZED, [
-                'request' => $request,
-                'authenticationService' => $this->authenticationService,
-                'error' => $error
-            ]);
-            if ($event instanceof ResponseInterface) {
-                return $event;
-            }
-
-            $messages = $this->getErrorMessages($error);
-            if (empty($messages)) {
-                $messages = [$this->options->getMessagesOptions()->getMessage(MessagesOptions::UNAUTHORIZED)];
-            }
-
-            //add a flash message in case the login page displays errors
-            if ($this->flashMessenger) {
-                $this->flashMessenger->addError($messages);
-            }
-
-            /** @var Uri $uri */
-            $uri = $this->routeHelper->getUri($this->options->getLoginRoute());
-            if ($this->areUriEqual($uri, $request->getUri())) {
-                throw new RuntimeException(
-                    'Default unauthorized listener has detected that the login route is not authorized either.' .
-                    ' This can result in an endless redirect loop. ' .
-                    'Please edit your  authorization schema to open login route to guests'
-                );
-            }
-            if ($this->options->isEnableWantedUrl()) {
-                $uri = $this->appendQueryParam(
-                    $uri,
-                    $this->options->getWantedUrlName(),
-                    $request->getUri()->__toString()
-                );
-            }
-
-            return new RedirectResponse($uri);
+        $event = $this->dispatchEvent(AuthenticationEvent::EVENT_UNAUTHORIZED, [
+            'request' => $request,
+            'response' => $response,
+            'authenticationService' => $this->authenticationService,
+            'error' => $error
+        ]);
+        if ($event instanceof ResponseInterface) {
+            return $event;
         }
 
-        return $next($request, $response, $error);
+        $messages = $this->getErrorMessages($error);
+        if (empty($messages)) {
+            $messages = [$this->options->getMessagesOptions()->getMessage(MessagesOptions::UNAUTHORIZED)];
+        }
+
+        //add a flash message in case the login page displays errors
+        if ($this->flashMessenger) {
+            $this->flashMessenger->addError($messages);
+        }
+
+        /** @var Uri $uri */
+        $uri = $this->routeHelper->getUri($this->options->getLoginRoute());
+        if ($this->areUriEqual($uri, $request->getUri())) {
+            throw new RuntimeException(
+                'Default unauthorized listener has detected that the login route is not authorized either.' .
+                ' This can result in an endless redirect loop. ' .
+                'Please edit your  authorization schema to open login route to guests'
+            );
+        }
+        if ($this->options->isEnableWantedUrl()) {
+            $uri = $this->appendQueryParam(
+                $uri,
+                $this->options->getWantedUrlName(),
+                $request->getUri()->__toString()
+            );
+        }
+
+        return new RedirectResponse($uri);
+    }
+
+    protected function getRedirectUri()
+    {
+        $loginRoute = $this->options->getLoginRoute();
+        $uri = $this->urlHelper->generate([
+            $loginRoute['route_name'] ?? '',
+            $loginRoute['route_params'] ?? [],
+            $loginRoute['query_params'] ?? [],
+            $loginRoute['fragment_identifier'],
+            $loginRoute['options'] ?? []
+        ]);
     }
 
     /**
@@ -146,7 +192,7 @@ class UnauthorizedHandler implements AuthenticationEventListenerInterface
                     $messages[] = $e;
                 }
             }
-        } elseif ($error instanceof \Exception) {
+        } elseif ($error instanceof \Exception || $error instanceof \Throwable) {
             if ($this->isDebug() || $error instanceof UnauthorizedException) {
                 $messages[] = $error->getMessage();
             }

@@ -13,7 +13,7 @@ use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\Action\LogoutAction;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Helpers\Route\RouteOptionHelper;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class LogoutActionFactory

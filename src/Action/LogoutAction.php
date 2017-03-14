@@ -16,6 +16,8 @@ use Dot\Authentication\Web\Event\AuthenticationEventListenerTrait;
 use Dot\Authentication\Web\Event\DispatchAuthenticationEventTrait;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Helpers\Route\RouteOptionHelper;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\RedirectResponse;
@@ -24,7 +26,7 @@ use Zend\Diactoros\Response\RedirectResponse;
  * Class LogoutAction
  * @package Dot\Authentication\Web\Action
  */
-class LogoutAction implements AuthenticationEventListenerInterface
+class LogoutAction implements MiddlewareInterface, AuthenticationEventListenerInterface
 {
     use AuthenticationEventListenerTrait;
     use DispatchAuthenticationEventTrait;
@@ -56,15 +58,11 @@ class LogoutAction implements AuthenticationEventListenerInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable|null $next
-     * @return RedirectResponse|ResponseInterface
+     * @param DelegateInterface $delegate
+     * @return ResponseInterface
      */
-    public function __invoke(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next = null
-    ): ResponseInterface {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    {
         if (!$this->authentication->hasIdentity()) {
             return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLogoutRoute()));
         }

@@ -10,7 +10,7 @@ declare(strict_types = 1);
 namespace Dot\Authentication\Web\Factory;
 
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class WebAuthenticationOptionsFactory

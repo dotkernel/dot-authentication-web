@@ -13,8 +13,8 @@ use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\ErrorHandler\UnauthorizedHandler;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
-use Dot\Helpers\Route\RouteOptionHelper;
-use Interop\Container\ContainerInterface;
+use Dot\Helpers\Route\RouteHelper;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class UnauthorizedHandlerFactory
@@ -32,7 +32,7 @@ class UnauthorizedHandlerFactory extends BaseActionFactory
         /** @var UnauthorizedHandler $handler */
         $handler = new $requestedName(
             $container->get(AuthenticationInterface::class),
-            $container->get(RouteOptionHelper::class),
+            $container->get(RouteHelper::class),
             $container->get(WebAuthenticationOptions::class),
             $container->get(FlashMessengerInterface::class)
         );

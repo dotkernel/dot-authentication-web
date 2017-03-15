@@ -12,7 +12,7 @@ namespace Dot\Authentication\Web\Factory;
 use Dot\Authentication\Web\Event\AuthenticationEventListenerInterface;
 use Dot\Authentication\Web\Exception\RuntimeException;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Zend\EventManager\EventManagerInterface;
 
 /**

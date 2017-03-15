@@ -20,7 +20,9 @@ use Dot\Authentication\Web\Options\MessagesOptions;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Authentication\Web\Utils;
 use Dot\FlashMessenger\FlashMessengerInterface;
-use Dot\Helpers\Route\RouteOptionHelper;
+use Dot\Helpers\Route\RouteHelper;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\HtmlResponse;
@@ -32,7 +34,7 @@ use Zend\Expressive\Template\TemplateRendererInterface;
  * Class LoginAction
  * @package Dot\Authentication\Web\Action
  */
-class LoginAction implements AuthenticationEventListenerInterface
+class LoginAction implements MiddlewareInterface, AuthenticationEventListenerInterface
 {
     use DispatchAuthenticationEventTrait;
     use AuthenticationEventListenerTrait;
@@ -40,7 +42,7 @@ class LoginAction implements AuthenticationEventListenerInterface
     /** @var  AuthenticationInterface */
     protected $authentication;
 
-    /** @var  RouteOptionHelper */
+    /** @var  RouteHelper */
     protected $routeHelper;
 
     /** @var  WebAuthenticationOptions */
@@ -62,14 +64,14 @@ class LoginAction implements AuthenticationEventListenerInterface
      * LoginAction constructor.
      * @param AuthenticationInterface $authentication
      * @param TemplateRendererInterface $template
-     * @param RouteOptionHelper $routeHelper
+     * @param RouteHelper $routeHelper
      * @param WebAuthenticationOptions $options
      * @param FlashMessengerInterface $flashMessenger
      */
     public function __construct(
         AuthenticationInterface $authentication,
         TemplateRendererInterface $template,
-        RouteOptionHelper $routeHelper,
+        RouteHelper $routeHelper,
         WebAuthenticationOptions $options,
         FlashMessengerInterface $flashMessenger
     ) {
@@ -82,17 +84,13 @@ class LoginAction implements AuthenticationEventListenerInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable|null $next
+     * @param DelegateInterface $delegate
      * @return ResponseInterface
      */
-    public function __invoke(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next = null
-    ): ResponseInterface {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    {
         if ($this->authentication->hasIdentity()) {
-            return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLoginRoute()));
+            return new RedirectResponse($this->routeHelper->generateUri($this->options->getAfterLoginRoute()));
         }
 
         $this->request = $request;
@@ -142,7 +140,7 @@ class LoginAction implements AuthenticationEventListenerInterface
                     if (empty($error)) {
                         $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_SUCCESS, $params);
 
-                        $uri = $this->routeHelper->getUri($this->options->getAfterLoginRoute());
+                        $uri = $this->routeHelper->generateUri($this->options->getAfterLoginRoute());
                         if ($this->options->isEnableWantedUrl()) {
                             $params = $request->getQueryParams();
                             $wantedUrlName = $this->options->getWantedUrlName();

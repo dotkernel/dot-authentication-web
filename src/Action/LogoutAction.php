@@ -15,7 +15,9 @@ use Dot\Authentication\Web\Event\AuthenticationEventListenerInterface;
 use Dot\Authentication\Web\Event\AuthenticationEventListenerTrait;
 use Dot\Authentication\Web\Event\DispatchAuthenticationEventTrait;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
-use Dot\Helpers\Route\RouteOptionHelper;
+use Dot\Helpers\Route\RouteHelper;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\RedirectResponse;
@@ -24,7 +26,7 @@ use Zend\Diactoros\Response\RedirectResponse;
  * Class LogoutAction
  * @package Dot\Authentication\Web\Action
  */
-class LogoutAction implements AuthenticationEventListenerInterface
+class LogoutAction implements MiddlewareInterface, AuthenticationEventListenerInterface
 {
     use AuthenticationEventListenerTrait;
     use DispatchAuthenticationEventTrait;
@@ -32,7 +34,7 @@ class LogoutAction implements AuthenticationEventListenerInterface
     /** @var  AuthenticationInterface */
     protected $authentication;
 
-    /** @var  RouteOptionHelper */
+    /** @var  RouteHelper */
     protected $routeHelper;
 
     /** @var  WebAuthenticationOptions */
@@ -41,12 +43,12 @@ class LogoutAction implements AuthenticationEventListenerInterface
     /**
      * LogoutActionFactory constructor.
      * @param AuthenticationInterface $authentication
-     * @param RouteOptionHelper $routeHelper
+     * @param RouteHelper $routeHelper
      * @param WebAuthenticationOptions $options
      */
     public function __construct(
         AuthenticationInterface $authentication,
-        RouteOptionHelper $routeHelper,
+        RouteHelper $routeHelper,
         WebAuthenticationOptions $options
     ) {
         $this->authentication = $authentication;
@@ -56,17 +58,13 @@ class LogoutAction implements AuthenticationEventListenerInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable|null $next
-     * @return RedirectResponse|ResponseInterface
+     * @param DelegateInterface $delegate
+     * @return ResponseInterface
      */
-    public function __invoke(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next = null
-    ): ResponseInterface {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    {
         if (!$this->authentication->hasIdentity()) {
-            return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLogoutRoute()));
+            return new RedirectResponse($this->routeHelper->generateUri($this->options->getAfterLogoutRoute()));
         }
         $event = $this->dispatchEvent(AuthenticationEvent::EVENT_BEFORE_LOGOUT, [
             'request' => $request,
@@ -83,7 +81,7 @@ class LogoutAction implements AuthenticationEventListenerInterface
             'authenticationService' => $this->authentication
         ]);
 
-        $uri = $this->routeHelper->getUri($this->options->getAfterLogoutRoute());
+        $uri = $this->routeHelper->generateUri($this->options->getAfterLogoutRoute());
         return new RedirectResponse($uri);
     }
 }

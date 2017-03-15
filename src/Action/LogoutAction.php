@@ -15,7 +15,7 @@ use Dot\Authentication\Web\Event\AuthenticationEventListenerInterface;
 use Dot\Authentication\Web\Event\AuthenticationEventListenerTrait;
 use Dot\Authentication\Web\Event\DispatchAuthenticationEventTrait;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
-use Dot\Helpers\Route\RouteOptionHelper;
+use Dot\Helpers\Route\RouteHelper;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -34,7 +34,7 @@ class LogoutAction implements MiddlewareInterface, AuthenticationEventListenerIn
     /** @var  AuthenticationInterface */
     protected $authentication;
 
-    /** @var  RouteOptionHelper */
+    /** @var  RouteHelper */
     protected $routeHelper;
 
     /** @var  WebAuthenticationOptions */
@@ -43,12 +43,12 @@ class LogoutAction implements MiddlewareInterface, AuthenticationEventListenerIn
     /**
      * LogoutActionFactory constructor.
      * @param AuthenticationInterface $authentication
-     * @param RouteOptionHelper $routeHelper
+     * @param RouteHelper $routeHelper
      * @param WebAuthenticationOptions $options
      */
     public function __construct(
         AuthenticationInterface $authentication,
-        RouteOptionHelper $routeHelper,
+        RouteHelper $routeHelper,
         WebAuthenticationOptions $options
     ) {
         $this->authentication = $authentication;
@@ -64,7 +64,7 @@ class LogoutAction implements MiddlewareInterface, AuthenticationEventListenerIn
     public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
     {
         if (!$this->authentication->hasIdentity()) {
-            return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLogoutRoute()));
+            return new RedirectResponse($this->routeHelper->generateUri($this->options->getAfterLogoutRoute()));
         }
         $event = $this->dispatchEvent(AuthenticationEvent::EVENT_BEFORE_LOGOUT, [
             'request' => $request,
@@ -81,7 +81,7 @@ class LogoutAction implements MiddlewareInterface, AuthenticationEventListenerIn
             'authenticationService' => $this->authentication
         ]);
 
-        $uri = $this->routeHelper->getUri($this->options->getAfterLogoutRoute());
+        $uri = $this->routeHelper->generateUri($this->options->getAfterLogoutRoute());
         return new RedirectResponse($uri);
     }
 }

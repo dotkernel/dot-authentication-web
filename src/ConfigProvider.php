@@ -26,16 +26,7 @@ class ConfigProvider
             'dependencies' => $this->getDependenciesConfig(),
 
             'dot_authentication' => [
-                'web' => [
-                    'event_listeners' => [],
-
-                    'login_route' => ['route_name' => 'login'],
-                    'logout_route' => ['route_name' => 'logout'],
-
-                    'messages_options' => [
-                        'messages' => [],
-                    ],
-                ]
+                'web' => []
             ]
         ];
     }

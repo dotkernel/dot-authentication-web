@@ -20,7 +20,7 @@ use Dot\Authentication\Web\Options\MessagesOptions;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Authentication\Web\Utils;
 use Dot\FlashMessenger\FlashMessengerInterface;
-use Dot\Helpers\Route\RouteOptionHelper;
+use Dot\Helpers\Route\RouteHelper;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -42,7 +42,7 @@ class LoginAction implements MiddlewareInterface, AuthenticationEventListenerInt
     /** @var  AuthenticationInterface */
     protected $authentication;
 
-    /** @var  RouteOptionHelper */
+    /** @var  RouteHelper */
     protected $routeHelper;
 
     /** @var  WebAuthenticationOptions */
@@ -64,14 +64,14 @@ class LoginAction implements MiddlewareInterface, AuthenticationEventListenerInt
      * LoginAction constructor.
      * @param AuthenticationInterface $authentication
      * @param TemplateRendererInterface $template
-     * @param RouteOptionHelper $routeHelper
+     * @param RouteHelper $routeHelper
      * @param WebAuthenticationOptions $options
      * @param FlashMessengerInterface $flashMessenger
      */
     public function __construct(
         AuthenticationInterface $authentication,
         TemplateRendererInterface $template,
-        RouteOptionHelper $routeHelper,
+        RouteHelper $routeHelper,
         WebAuthenticationOptions $options,
         FlashMessengerInterface $flashMessenger
     ) {
@@ -90,7 +90,7 @@ class LoginAction implements MiddlewareInterface, AuthenticationEventListenerInt
     public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
     {
         if ($this->authentication->hasIdentity()) {
-            return new RedirectResponse($this->routeHelper->getUri($this->options->getAfterLoginRoute()));
+            return new RedirectResponse($this->routeHelper->generateUri($this->options->getAfterLoginRoute()));
         }
 
         $this->request = $request;
@@ -140,7 +140,7 @@ class LoginAction implements MiddlewareInterface, AuthenticationEventListenerInt
                     if (empty($error)) {
                         $this->dispatchEvent(AuthenticationEvent::EVENT_AUTHENTICATION_SUCCESS, $params);
 
-                        $uri = $this->routeHelper->getUri($this->options->getAfterLoginRoute());
+                        $uri = $this->routeHelper->generateUri($this->options->getAfterLoginRoute());
                         if ($this->options->isEnableWantedUrl()) {
                             $params = $request->getQueryParams();
                             $wantedUrlName = $this->options->getWantedUrlName();

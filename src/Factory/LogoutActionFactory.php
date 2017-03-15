@@ -12,7 +12,7 @@ namespace Dot\Authentication\Web\Factory;
 use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\Action\LogoutAction;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
-use Dot\Helpers\Route\RouteOptionHelper;
+use Dot\Helpers\Route\RouteHelper;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -31,7 +31,7 @@ class LogoutActionFactory extends BaseActionFactory
         /** @var LogoutAction $action */
         $action = new $requestedName(
             $container->get(AuthenticationInterface::class),
-            $container->get(RouteOptionHelper::class),
+            $container->get(RouteHelper::class),
             $container->get(WebAuthenticationOptions::class)
         );
 

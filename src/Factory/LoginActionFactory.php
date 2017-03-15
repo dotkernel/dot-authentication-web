@@ -13,7 +13,7 @@ use Dot\Authentication\AuthenticationInterface;
 use Dot\Authentication\Web\Action\LoginAction;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
-use Dot\Helpers\Route\RouteOptionHelper;
+use Dot\Helpers\Route\RouteHelper;
 use Psr\Container\ContainerInterface;
 use Zend\Expressive\Template\TemplateRendererInterface;
 
@@ -37,7 +37,7 @@ class LoginActionFactory extends BaseActionFactory
         $action = new $requestedName(
             $container->get(AuthenticationInterface::class),
             $container->get(TemplateRendererInterface::class),
-            $container->get(RouteOptionHelper::class),
+            $container->get(RouteHelper::class),
             $container->get(WebAuthenticationOptions::class),
             $container->get(FlashMessengerInterface::class)
         );

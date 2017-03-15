@@ -19,16 +19,13 @@ use Dot\Authentication\Web\Exception\RuntimeException;
 use Dot\Authentication\Web\Options\MessagesOptions;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
-use Dot\Helpers\Route\RouteOptionHelper;
-use Dot\Helpers\Route\UriHelperTrait;
+use Dot\Helpers\Route\RouteHelper;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UriInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
-use Zend\Expressive\Helper\UrlHelper;
 
 /**
  * Class UnauthorizedHandler
@@ -38,18 +35,14 @@ class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventLis
 {
     use AuthenticationEventListenerTrait;
     use DispatchAuthenticationEventTrait;
-    use UriHelperTrait;
 
     /** @var  AuthenticationInterface */
     protected $authenticationService;
 
-    /** @var  UrlHelper */
-    protected $urlHelper;
-
     /** @var  WebAuthenticationOptions */
     protected $options;
 
-    /** @var  RouteOptionHelper */
+    /** @var  RouteHelper */
     protected $routeHelper;
 
     /** @var  FlashMessengerInterface */
@@ -64,13 +57,13 @@ class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventLis
     /**
      * UnauthorizedHandler constructor.
      * @param AuthenticationInterface $authenticationService
-     * @param RouteOptionHelper $routeHelper
+     * @param RouteHelper $routeHelper
      * @param WebAuthenticationOptions $options
      * @param FlashMessengerInterface $flashMessenger
      */
     public function __construct(
         AuthenticationInterface $authenticationService,
-        RouteOptionHelper $routeHelper,
+        RouteHelper $routeHelper,
         WebAuthenticationOptions $options,
         FlashMessengerInterface $flashMessenger
     ) {
@@ -147,8 +140,8 @@ class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventLis
         }
 
         /** @var Uri $uri */
-        $uri = $this->routeHelper->getUri($this->options->getLoginRoute());
-        if ($this->areUriEqual($uri, $request->getUri())) {
+        $uri = $this->routeHelper->generateUri($this->options->getLoginRoute());
+        if ($this->routeHelper->uriEquals($uri, $request->getUri())) {
             throw new RuntimeException(
                 'Default unauthorized listener has detected that the login route is not authorized either.' .
                 ' This can result in an endless redirect loop. ' .
@@ -156,7 +149,7 @@ class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventLis
             );
         }
         if ($this->options->isEnableWantedUrl()) {
-            $uri = $this->appendQueryParam(
+            $uri = $this->routeHelper->appendQueryParam(
                 $uri,
                 $this->options->getWantedUrlName(),
                 $request->getUri()->__toString()
@@ -164,18 +157,6 @@ class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventLis
         }
 
         return new RedirectResponse($uri);
-    }
-
-    protected function getRedirectUri()
-    {
-        $loginRoute = $this->options->getLoginRoute();
-        $uri = $this->urlHelper->generate([
-            $loginRoute['route_name'] ?? '',
-            $loginRoute['route_params'] ?? [],
-            $loginRoute['query_params'] ?? [],
-            $loginRoute['fragment_identifier'],
-            $loginRoute['options'] ?? []
-        ]);
     }
 
     /**
@@ -230,18 +211,5 @@ class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventLis
     public function setDebug(bool $debug)
     {
         $this->debug = $debug;
-    }
-
-    /**
-     * @param UriInterface $uri1
-     * @param UriInterface $uri2
-     * @return bool
-     */
-    protected function areUriEqual(UriInterface $uri1, UriInterface $uri2): bool
-    {
-        return $uri1->getScheme() === $uri2->getScheme()
-            && $uri1->getHost() === $uri2->getHost()
-            && $uri1->getPath() === $uri2->getPath()
-            && $uri1->getPort() === $uri2->getPort();
     }
 }

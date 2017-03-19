@@ -84,14 +84,6 @@ class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventLis
     {
         try {
             $response = $delegate->process($request);
-
-            if (in_array($response->getStatusCode(), $this->statusCodes)) {
-                return $this->handleUnauthorizedError(
-                    $this->options->getMessagesOptions()->getMessage(MessagesOptions::UNAUTHORIZED),
-                    $request,
-                    $response
-                );
-            }
             return $response;
         } catch (UnauthorizedException $e) {
             return $this->handleUnauthorizedError($e, $request);

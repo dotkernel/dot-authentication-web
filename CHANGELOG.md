@@ -1,3 +1,21 @@
+## 0.2.1 - 2017-03-19
+
+### Changed
+* Nothing
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* default routes option values
+
+### Fixed
+* Nothing
+
+
 ## 0.2.0 - 2017-03-15
 
 Updating package to support ZE2 and other DotKernel dependencies updates

@@ -18,16 +18,16 @@ use Zend\Stdlib\AbstractOptions;
 class WebAuthenticationOptions extends AbstractOptions
 {
     /** @var string|array */
-    protected $loginRoute = ['route_name' => 'login'];
+    protected $loginRoute = [];
 
     /** @var string|array */
-    protected $logoutRoute = ['route_name' => 'logout'];
+    protected $logoutRoute = [];
 
     /** @var string|array */
-    protected $afterLoginRoute = ['route_name' => 'home'];
+    protected $afterLoginRoute = [];
 
     /** @var string|array */
-    protected $afterLogoutRoute = ['route_name' => 'login'];
+    protected $afterLogoutRoute = [];
 
     /** @var  string */
     protected $loginTemplate = '';

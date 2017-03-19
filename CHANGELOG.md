@@ -1,3 +1,21 @@
+## 0.2.2 - 2017-03-19
+
+### Changed
+* returning a response with unauthorized status code does not triggers the UnauthorizedHandler anymore
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* Nothing
+
+
 ## 0.2.1 - 2017-03-19
 
 ### Changed

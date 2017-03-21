@@ -1,3 +1,21 @@
+## 0.2.3 - 2017-03-21
+
+### Changed
+* Removed unnecessary parameters from UnauthorizedHandler
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* Nothing
+
+
 ## 0.2.2 - 2017-03-19
 
 ### Changed

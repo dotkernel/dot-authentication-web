@@ -103,17 +103,14 @@ class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventLis
     /**
      * @param $error
      * @param ServerRequestInterface $request
-     * @param ResponseInterface|null $response
      * @return ResponseInterface
      */
     protected function handleUnauthorizedError(
         $error,
-        ServerRequestInterface $request,
-        ResponseInterface $response = null
+        ServerRequestInterface $request
     ): ResponseInterface {
         $event = $this->dispatchEvent(AuthenticationEvent::EVENT_UNAUTHORIZED, [
             'request' => $request,
-            'response' => $response,
             'authenticationService' => $this->authenticationService,
             'error' => $error
         ]);

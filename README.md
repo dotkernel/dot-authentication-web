@@ -127,5 +127,32 @@ class AuthenticationEvent extends Event
 * by the time this event is triggered you can be sure the authentiation is completed and successfull. Listening to this event might be helpful for logging reasons. After this, the page will be redirected to the after login route, or the wanted url if it is the case.
 
 ##### AuthenticationEvent::EVENT_AUTHENTICATION_ERROR
+* triggered on any authentication error status, like failed validation, or errors set by other event listeners. After event triggers, it will imediately do a PRG redirect back to the login page, to display the error messages. In this case, you can only listen for the event, but returning a ResponseInterface will not affect the authentication flow(could change in the future if it will be considered useful). You can mainly listen for this event for logging purposes.
 
+##### AuthenticationEvent::EVENT_AUTHENTICATION_BEFORE_RENDER
+* this is an event that could not be considered part of the authentication process. It is triggered right before displaying the login page(template rendering), to let you change the response or inject variables into the template.
+* the parameters that you get in the event object are
+    * `request` - the server request object
+    * `authenticationService` - authentication service implementation
+    * `template` - the login template name, as defined in the configuration
+
+* the reasons you might want to listen to this event are
+    * change the template name. Just listen for the event, replace the `template` event parameter with your own value, and it will be considered when rendering the page.
+    * any additional named parameter set in the event object will be eventually injected as template data. So this is a good place for example to inject the login form object into the template to be displayed. This is how frontend and admin application are done for example.
+
+As you can see, listening to authentication events allows you to inject additional logic into the login process. It also allows you to do it in a more decoupled way. For a full understanding of the entire process, make sure to check the `LoginAction` class. You can also find the frontend and admin applications useful, as they already provide some customization. Check the corresponding authentication event listeners defined there, for a sample of what you can achieve through listeners.
+
+## Logout flow
+
+The logout process is much simpler. It triggers 2 events: after and before logout. In between, the authenticated identity is cleared using the `clearIdentity()` method of the authentication service. After that, the client is redirected the the configured `after_logout_route`.
+
+### Logout events
+
+##### AuthenticationEvent::EVENT_BEFORE_LOGOUT
+* triggered before clearing the identity, it can be used for logging reasons, customize the logout process. Returning a ResponseInterface from any of the event listeners, will stop the chain, and that response will be returned directly to the client. Please note, that doing that will stop the predefined logout process to happen, meaning that the identity will not be cleared and the after logout event will not be triggered. You'll need to make sure you do this in your event listeners if you choose to return your own response.
+
+##### AuthenticationEvent::EVENT_AFTER_LOGOUT
+* happens right after the identity was cleared. At this point, you can assume the user was logged out. Could be used for logging purposes, or any other post-logout actions. Returning a response object will not be considered here, instead the client will be redirected to the after logout route.
+
+## UnauthorizedExceptions handling
 

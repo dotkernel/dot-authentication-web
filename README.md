@@ -154,5 +154,89 @@ The logout process is much simpler. It triggers 2 events: after and before logou
 ##### AuthenticationEvent::EVENT_AFTER_LOGOUT
 * happens right after the identity was cleared. At this point, you can assume the user was logged out. Could be used for logging purposes, or any other post-logout actions. Returning a response object will not be considered here, instead the client will be redirected to the after logout route.
 
-## UnauthorizedExceptions handling
+## UnauthorizedException handling
+
+Zend Expressive error handlers are middleware that wraps the response in a try-catch block. They are registered early in the pipeline, in order to get all possible exceptions. This package's UnauthorizedHandler handles the following exceptions
+* UnauthorizedException - the native authentication defined exception
+* Throwable or Exception types that have an exception code 401(http unauthorized)
+
+For any other kind of exceptions, it re-throws them in order to be handles by other error handlers.
+
+### Events
+
+When an unauthorized exception is catched, the following steps are followed by the error handler
+* trigger an unauthorized event
+* creates an error message from the error object/exception recevied. Note that will take into consideration the debug flag
+* it redirect to the configured login route, setting the error message in the flash messenger. It will also append a wanted url as a GET parameter, if this is enabled, so that after successful authentication, the user will be redirected back to the requested page.
+
+##### AuthenticationEvent::EVENT_UNAUTHORIZED
+* is triggered right after catching an unauthorized exception. The event object will carry the following parameters
+    * `request` - the server request object
+    * `authenticationService` - the authentication service implementation
+    * `error` - the error object/exception as catched by the handler
+
+You can listen to this event mainly for logging purposes or additional actions after this kind of exception. You can also return a ResponseInterface from one of the event listeners(the event chain will stop), in which case, that response will be returned to the client as-is, basically overwriting the entire error handling process.
+
+## Writing an authentication listener
+
+Authentication listeners must implement `AuthenticationEventListenerInterface`, an interface that defines all possible event method handlers. You should also extend the `AbstractAuthenticationEventListener` or use the `AuthenticationEventListenerTrait` which are already supporting the event attach methods. They also implement the event listener interface, by providing empty interface methods. This helps when writing your event listener, as you may want to listen to only some of the events. This will let you implement just the event handler methods that you are interested in.
+
+##### AuthenticationEventListenerInterface.php
+```php
+// the authentication event listener interface defined in this package
+interface AuthenticationEventListenerInterface extends ListenerAggregateInterface
+{
+    public function onBeforeAuthentication(AuthenticationEvent $e);
+
+    public function onAfterAuthentication(AuthenticationEvent $e);
+
+    public function onAuthenticationSuccess(AuthenticationEvent $e);
+
+    public function onAuthenticationError(AuthenticationEvent $e);
+
+    public function onAuthenticationBeforeRender(AuthenticationEvent $e);
+
+    public function onBeforeLogout(AuthenticationEvent $e);
+
+    public function onAfterLogout(AuthenticationEvent $e);
+
+    public function onUnauthorized(AuthenticationEvent $e);
+}
+```
+
+##### MyAuthenticationEventListener.php
+```php
+//...
+class MyAuthenticationEventListener extends AbstractAuthenticationEventListener
+{
+    public function onBeforeAuthentication(AuthenticationEvent $e)
+    {
+        // do something...
+    }
+    
+    // other event handlers methods
+}
+```
+
+* register the event listener. You can do this multiple ways: use a delegator factory on the LoginAction, LogoutAction or UnauthorizedHandler. We also provide a more convenient way of attaching your event listeners - through configuration. You can provide a list of authentication event listeners, as class names or service names, which will be attached to all types of authentication events
+
+```php
+return [
+    'dot_authentication' => [
+        'web' => [
+            //...
+            
+            // event listeners for authentication, logout and unauthorized events
+            'event_listeners' => [
+                [
+                    'type' => MyAuthenticationEventListener::class,
+                    'priority' => 1
+                ],
+            ],
+            
+           //....
+        ]
+    ]
+];
+```
 

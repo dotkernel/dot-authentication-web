@@ -155,8 +155,11 @@ class LoginAction implements MiddlewareInterface, AuthenticationEventListenerInt
                         return $this->prgRedirect($error);
                     }
                 } else {
-                    $message = $this->options->getMessagesOptions()
-                        ->getMessage(Utils::$authResultCodeToMessageMap[$result->getCode()]);
+                    $message = $result->getMessage();
+                    if (empty($message)) {
+                        $message = $this->options->getMessagesOptions()
+                            ->getMessage(Utils::$authResultCodeToMessageMap[$result->getCode()]);
+                    }
                     $params += [
                         'error' => $message
                     ];

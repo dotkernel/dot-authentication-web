@@ -1,3 +1,21 @@
+## 0.2.4 - 2017-07-06
+
+### Changed
+* on authentication error, take the authentication result message into consideration too
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* Nothing
+
+
 ## 0.2.3 - 2017-03-21
 
 ### Changed

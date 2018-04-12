@@ -1,3 +1,24 @@
+## 1.0.0 - 2018-04-12
+
+### Changed
+* Middleware support
+* Update `zendframework/zend-expressive` to ^3.0
+* Update `zendframework/zend-expressive-template` to ^2.0
+* Update `dotkernel/dot-helpers` to ^1.0
+
+### Added
+* PSR-15 Middleware support
+
+### Deprecated
+* Nothing
+
+### Removed
+* HTTP Interop middleware support
+
+### Fixed
+* Nothing
+
+
 ## 0.2.4 - 2017-07-06
 
 ### Changed

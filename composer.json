@@ -32,7 +32,7 @@
     "psr-4": {
       "Dot\\Authentication\\Web\\": "src/"
     }
-  },git st
+  },
   "autoload-dev": {
     "psr-4": {
       "DotTest\\Authentication\\Web\\": "test/"

@@ -1,3 +1,21 @@
+## 1.0.1 - 2018-05-14
+
+### Changed
+* Updated `dot-flashmessenger plugin` dependency
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* Nothing
+
+
 ## 1.0.0 - 2018-04-12
 
 ### Changed

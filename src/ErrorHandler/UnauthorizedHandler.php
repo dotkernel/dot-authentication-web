@@ -20,10 +20,10 @@ use Dot\Authentication\Web\Options\MessagesOptions;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteHelper;
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
 
@@ -75,15 +75,15 @@ class UnauthorizedHandler implements MiddlewareInterface, AuthenticationEventLis
 
     /**
      * @param ServerRequestInterface $request
-     * @param DelegateInterface $delegate
+     * @param RequestHandlerInterface $handler
      * @return ResponseInterface
      * @throws \Exception
      * @throws \Throwable
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            $response = $delegate->process($request);
+            $response = $handler->handle($request);
             return $response;
         } catch (UnauthorizedException $e) {
             return $this->handleUnauthorizedError($e, $request);

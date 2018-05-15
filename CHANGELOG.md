@@ -1,28 +1,11 @@
-## 1.0.1 - 2018-05-14
-
-### Changed
-* Updated `dot-flashmessenger plugin` dependency
-
-### Added
-* Nothing
-
-### Deprecated
-* Nothing
-
-### Removed
-* Nothing
-
-### Fixed
-* Nothing
-
-
-## 1.0.0 - 2018-04-12
+## 1.0.0 - 2018-05-15
 
 ### Changed
 * Middleware support
 * Update `zendframework/zend-expressive` to ^3.0
 * Update `zendframework/zend-expressive-template` to ^2.0
 * Update `dotkernel/dot-helpers` to ^1.0
+* Updated `dot-flashmessenger plugin` dependency
 
 ### Added
 * PSR-15 Middleware support
@@ -31,7 +14,7 @@
 * Nothing
 
 ### Removed
-* HTTP Interop middleware support
+* HTTP InterOp middleware support
 
 ### Fixed
 * Nothing

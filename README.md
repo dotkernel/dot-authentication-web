@@ -156,7 +156,7 @@ The logout process is much simpler. It triggers 2 events: after and before logou
 
 ## UnauthorizedException handling
 
-Zend Expressive error handlers are middleware that wraps the response in a try-catch block. They are registered early in the pipeline, in order to get all possible exceptions. This package's UnauthorizedHandler handles the following exceptions
+Mezzio error handlers are middleware that wraps the response in a try-catch block. They are registered early in the pipeline, in order to get all possible exceptions. This package's UnauthorizedHandler handles the following exceptions
 * UnauthorizedException - the native authentication defined exception
 * Throwable or Exception types that have an exception code 401(http unauthorized)
 

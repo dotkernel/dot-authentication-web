@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 namespace Dot\Authentication\Web\Options;
 
-use Zend\Stdlib\AbstractOptions;
+use Laminas\Stdlib\AbstractOptions;
 
 /**
  * Class WebAuthenticationOptions

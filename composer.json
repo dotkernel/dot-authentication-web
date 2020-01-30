@@ -1,47 +1,46 @@
 {
-  "name": "dotkernel/dot-authentication-web",
-  "type": "library",
-  "description": "DotKernel login/logout authentication flow for web based applications",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "n3vrax",
-      "email": "tibi@apidemia.com"
+    "name": "dotkernel/dot-authentication-web",
+    "type": "library",
+    "description": "DotKernel login/logout authentication flow for web based applications",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "n3vrax",
+            "email": "tibi@apidemia.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "psr/http-message": "^1.0",
+        "laminas/laminas-servicemanager": "^3.3.0",
+        "dotkernel/dot-authentication": "^2.0",
+        "dotkernel/dot-event": "^2.0",
+        "dotkernel/dot-helpers": "^2.0",
+        "dotkernel/dot-flashmessenger": "^2.0",
+        "laminas/laminas-dependency-plugin": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8",
+        "squizlabs/php_codesniffer": "^2.3",
+        "laminas/laminas-stdlib": "^3.1",
+        "laminas/laminas-diactoros": "^1.7",
+        "mezzio/mezzio-template": "^2.0",
+        "mezzio/mezzio": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dot\\Authentication\\Web\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "DotTest\\Authentication\\Web\\": "test/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev",
+            "dev-develop": "1.1-dev"
+        }
     }
-  ],
-  "require": {
-    "php": "^7.1",
-    "psr/http-message": "^1.0",
-    "zendframework/zend-servicemanager": "^3.3.0",
-
-    "dotkernel/dot-authentication": "^1.0",
-    "dotkernel/dot-event": "^0.2",
-    "dotkernel/dot-helpers": "^1.0",
-    "dotkernel/dot-flashmessenger": "^1.0"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^4.8",
-    "squizlabs/php_codesniffer": "^2.3",
-
-    "zendframework/zend-stdlib": "^3.1",
-    "zendframework/zend-diactoros": "^1.7",
-    "zendframework/zend-expressive-template": "^2.0",
-    "zendframework/zend-expressive": "^3.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "Dot\\Authentication\\Web\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "DotTest\\Authentication\\Web\\": "test/"
-    }
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "1.0-dev",
-      "dev-develop": "1.1-dev"
-    }
-  }
 }

@@ -24,8 +24,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response\RedirectResponse;
-use Zend\Diactoros\Uri;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\Uri;
 
 /**
  * Class UnauthorizedHandler

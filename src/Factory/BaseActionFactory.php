@@ -13,7 +13,7 @@ use Dot\Authentication\Web\Event\AuthenticationEventListenerInterface;
 use Dot\Authentication\Web\Exception\RuntimeException;
 use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Psr\Container\ContainerInterface;
-use Zend\EventManager\EventManagerInterface;
+use Laminas\EventManager\EventManagerInterface;
 
 /**
  * Class BaseActionFactory

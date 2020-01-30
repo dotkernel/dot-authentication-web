@@ -15,7 +15,7 @@ use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\Helpers\Route\RouteHelper;
 use Psr\Container\ContainerInterface;
-use Zend\Expressive\Template\TemplateRendererInterface;
+use Mezzio\Template\TemplateRendererInterface;
 
 /**
  * Class LoginActionFactory

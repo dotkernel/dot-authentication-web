@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 namespace Dot\Authentication\Web\Event;
 
-use Zend\EventManager\ListenerAggregateInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
 
 /**
  * Interface AuthenticationEventListenerInterface

@@ -10,7 +10,7 @@ declare(strict_types = 1);
 namespace Dot\Authentication\Web\Event;
 
 use Psr\Http\Message\ResponseInterface;
-use Zend\EventManager\EventManagerAwareTrait;
+use Laminas\EventManager\EventManagerAwareTrait;
 
 /**
  * Class DispatchAuthenticationEventTrait

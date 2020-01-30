@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 namespace Dot\Authentication\Web\Options;
 
-use Zend\Stdlib\AbstractOptions;
-use Zend\Stdlib\ArrayUtils;
+use Laminas\Stdlib\AbstractOptions;
+use Laminas\Stdlib\ArrayUtils;
 
 /**
  * Class MessageOptions

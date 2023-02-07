@@ -1,3 +1,6 @@
+![OSS Lifecycle](https://img.shields.io/osslifecycle/dotkernel/dot-authentication-web)
+[![GitHub license](https://img.shields.io/github/license/dotkernel/dot-authentication-web)](https://github.com/dotkernel/dot-authentication-web/blob/2.0/LICENSE.md)
+
 # dot-authentication-web
 This package provides a simple login/logout flow for web applications built on top of dot-authentication. It relies on events to do the authentication process offering in the same time flexibility for customization and further extension.
 

@@ -16,11 +16,7 @@
         "dotkernel/dot-authentication": "^2.3.0",
         "dotkernel/dot-event": "^3.4.0",
         "dotkernel/dot-helpers": "^3.4.0",
-        "dotkernel/dot-flashmessenger": "^3.0",
-        "laminas/laminas-stdlib": "^3.17.0",
-        "laminas/laminas-diactoros": "^2.25.2",
-        "mezzio/mezzio-template": "^2.8.0",
-        "mezzio/mezzio": "^3.17.0"
+        "dotkernel/dot-flashmessenger": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.3.2",

@@ -9,6 +9,8 @@ declare(strict_types = 1);
 
 namespace Dot\Authentication\Web\Event;
 
+use Dot\Event\Event;
+use Laminas\EventManager\ResponseCollection;
 use Psr\Http\Message\ResponseInterface;
 use Laminas\EventManager\EventManagerAwareTrait;
 
@@ -26,7 +28,7 @@ trait DispatchAuthenticationEventTrait
      * @param null $target
      * @return AuthenticationEvent|mixed
      */
-    public function dispatchEvent(string $name, array $params = [], $target = null)
+    public function dispatchEvent(string $name, array $params = [], mixed $target = null): Event|ResponseCollection
     {
         if ($target === null) {
             $target = $this;

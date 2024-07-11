@@ -28,7 +28,7 @@ trait DispatchAuthenticationEventTrait
      * @param null $target
      * @return AuthenticationEvent|mixed
      */
-    public function dispatchEvent(string $name, array $params = [], mixed $target = null): Event|ResponseCollection|ResponseInterface
+    public function dispatchEvent(string $name, array $params = [], mixed $target = null): Event|ResponseCollection
     {
         if ($target === null) {
             $target = $this;
